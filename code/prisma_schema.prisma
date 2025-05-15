@@ -1,0 +1,225 @@
+// AI Character Council - Prisma Schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./ai_character_council.db"
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  settings    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  characters    Character[]
+  conversations Conversation[]
+  timelines     Timeline[]
+  notes         Note[]
+  tags          Tag[]
+}
+
+model Character {
+  id               String   @id @default(uuid())
+  projectId        String
+  name             String
+  bio              String?
+  personalityTraits Json
+  characterSheet   Json?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  project              Project                @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  conversationMessages ConversationMessage[]
+  characterEventLinks  CharacterEventLink[]
+  characterMemories    CharacterMemory[]
+  characterVersions    CharacterVersion[]
+  taggedItems          TaggedItem[]
+
+  @@index([projectId])
+}
+
+model CharacterVersion {
+  id           String   @id @default(uuid())
+  characterId  String
+  versionName  String
+  data         Json
+  createdAt    DateTime @default(now())
+  
+  character    Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  
+  @@index([characterId])
+}
+
+model CharacterMemory {
+  id           String   @id @default(uuid())
+  characterId  String
+  content      String
+  importance   Float    @default(0.5)
+  embedding    Bytes?   // Stored vector embedding
+  metadata     Json?
+  timestamp    DateTime @default(now())
+  
+  character    Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  
+  @@index([characterId])
+}
+
+model Conversation {
+  id          String   @id @default(uuid())
+  projectId   String
+  title       String
+  summary     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project     Project               @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  messages    ConversationMessage[]
+  taggedItems TaggedItem[]
+
+  @@index([projectId])
+}
+
+model ConversationMessage {
+  id             String   @id @default(uuid())
+  conversationId String
+  characterId    String?
+  role           String   // 'user', 'character', 'system'
+  content        String
+  metadata       Json?
+  timestamp      DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  character    Character?   @relation(fields: [characterId], references: [id])
+
+  @@index([conversationId])
+  @@index([characterId])
+}
+
+model Timeline {
+  id          String   @id @default(uuid())
+  projectId   String
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project  Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  events   TimelineEvent[]
+  taggedItems TaggedItem[]
+
+  @@index([projectId])
+}
+
+model TimelineEvent {
+  id          String   @id @default(uuid())
+  timelineId  String
+  title       String
+  description String?
+  date        String   // Flexible date format for fictional timelines
+  order       Int      @default(0)
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  timeline           Timeline             @relation(fields: [timelineId], references: [id], onDelete: Cascade)
+  characterEventLinks CharacterEventLink[]
+  taggedItems        TaggedItem[]
+
+  @@index([timelineId])
+}
+
+model CharacterEventLink {
+  id          String   @id @default(uuid())
+  characterId String
+  eventId     String
+  role        String?  // The character's role in this event
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  character Character     @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  event     TimelineEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([characterId, eventId])
+  @@index([characterId])
+  @@index([eventId])
+}
+
+model Note {
+  id          String   @id @default(uuid())
+  projectId   String
+  title       String
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  taggedItems TaggedItem[]
+
+  @@index([projectId])
+}
+
+model Tag {
+  id          String   @id @default(uuid())
+  projectId   String
+  name        String
+  type        String   // e.g., 'symbol', 'theme', 'location', etc.
+  color       String?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  taggedItems TaggedItem[]
+
+  @@unique([projectId, name, type])
+  @@index([projectId])
+}
+
+model TaggedItem {
+  id        String   @id @default(uuid())
+  tagId     String
+  itemId    String
+  itemType  String   // 'character', 'event', 'note', etc.
+  createdAt DateTime @default(now())
+
+  tag       Tag        @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  
+  character Character? @relation(fields: [itemId], references: [id]) onDelete: Cascade
+  conversation Conversation? @relation(fields: [itemId], references: [id]) onDelete: Cascade
+  timeline Timeline? @relation(fields: [itemId], references: [id]) onDelete: Cascade
+  timelineEvent TimelineEvent? @relation(fields: [itemId], references: [id]) onDelete: Cascade
+  note Note? @relation(fields: [itemId], references: [id]) onDelete: Cascade
+
+  @@unique([tagId, itemId, itemType])
+  @@index([tagId])
+  @@index([itemId])
+}
+
+model UserSettings {
+  id                 String   @id @default(uuid())
+  theme              String   @default("light")
+  llmProvider        String   @default("openai")
+  llmModel           String   @default("gpt-4")
+  maxMemoriesPerCall Int      @default(10)
+  apiKeys            Bytes?   // Encrypted API keys
+  lastBackup         DateTime?
+  updatedAt          DateTime @updatedAt
+}
+
+model ExportTemplate {
+  id          String   @id @default(uuid())
+  name        String
+  format      String   // 'word', 'markdown', 'scrivener', etc.
+  template    String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([name, format])
+}
