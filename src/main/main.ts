@@ -1,10 +1,14 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
 import * as isDev from 'electron-is-dev';
+import { initDatabase } from './services/initDatabase';
 
 let mainWindow: BrowserWindow | null = null;
 
-function createWindow() {
+async function createWindow() {
+  // Initialize database
+  await initDatabase();
+
   // Create the browser window
   mainWindow = new BrowserWindow({
     width: 1200,
@@ -35,17 +39,4 @@ function createWindow() {
 
 app.whenReady().then(createWindow);
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-});
-
-app.on('activate', () => {
-  if (mainWindow === null) {
-    createWindow();
-  }
-});
-
-// Add any IPC handlers here
-ipcMain.handle('ping', () => 'pong');
+// ... rest of the main.ts file
