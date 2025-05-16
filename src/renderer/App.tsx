@@ -1,71 +1,120 @@
-// src/renderer/App.tsx (updated to use services)
 import { useState, useEffect } from 'react';
-import { ProjectService } from './services/databaseService';
+import { ErrorBoundary } from './error/ErrorBoundary';
+import { ErrorProvider } from './components';
+import { RendererErrorHandler } from './error/RendererErrorHandler';
+import { createLogger } from '../shared/utils/logger';
+// Create a custom fallback UI for the root error boundary
+const RootErrorFallback = ({ error, resetError }: { error: Error, resetError: () => void }) => (
+  <div className="min-h-screen bg-red-50 flex items-center justify-center p-4">
+    <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full text-center">
+      <svg 
+        className="w-16 h-16 text-red-500 mx-auto mb-4" 
+        fill="none" 
+        stroke="currentColor" 
+        viewBox="0 0 24 24" 
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path 
+          strokeLinecap="round" 
+          strokeLinejoin="round" 
+          strokeWidth={2} 
+          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" 
+        />
+      </svg>
+      
+      <h1 className="text-2xl font-bold text-gray-800 mb-4">Application Error</h1>
+      <p className="text-gray-600 mb-6">
+        {error.message || 'An unexpected error occurred in the application.'}
+      </p>
+      
+      <div className="flex flex-col space-y-4">
+        <button 
+          onClick={resetError}
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded"
+        >
+          Try Again
+        </button>
+        
+        <button 
+          onClick={() => window.location.reload()}
+          className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded"
+        >
+          Reload Application
+        </button>
+      </div>
+    </div>
+  </div>
+);
 
 function App() {
   const [status, setStatus] = useState<string>('');
-  const [projects, setProjects] = useState<any[]>([]);
-  const [projectName, setProjectName] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
+  const [errorDemo, setErrorDemo] = useState<string | null>(null);
 
+  // Initialize error handling on component mount
+  useEffect(() => {
+    RendererErrorHandler.init();
+  }, []);
+
+  // Test connection to the main process
   const testConnection = async () => {
     try {
+      setStatus('Connecting...');
+      // @ts-ignore - window.electron is defined in the preload script
       const response = await window.electron.ping();
-      setStatus(`Connection successful: ${response}`);
+      setStatus(`Connection successful: ${response}`);      
     } catch (error) {
-      setStatus(`Connection failed: ${error}`);
+      setStatus(`Connection failed: ${error instanceof Error ? error.message : String(error)}`);
+      setErrorDemo(null);
     }
   };
 
-  const loadProjects = async () => {
-    setLoading(true);
+  // Demo error handling
+  const triggerDemoError = (type: string) => {
     try {
-      const projectsData = await ProjectService.getAll();
-      setProjects(projectsData);
-      setStatus(`Loaded ${projectsData.length} projects`);
-    } catch (error: any) {
-      setStatus(`Error loading projects: ${error.message}`);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const createProject = async () => {
-    if (!projectName) return;
-    
-    setLoading(true);
-    try {
-      const newProject = await ProjectService.create({
-        name: projectName,
-        description: 'Created from UI test'
-      });
+      setErrorDemo(type);
       
-      setStatus(`Created project: ${newProject.name}`);
-      setProjectName('');
-      loadProjects();
-    } catch (error: any) {
-      setStatus(`Error creating project: ${error.message}`);
-    } finally {
-      setLoading(false);
+      switch (type) {
+        case 'sync':
+          // Synchronous error
+          throw new Error('This is a demo synchronous error');
+        
+        case 'async':
+          // Asynchronous error
+          setTimeout(() => {
+            throw new Error('This is a demo asynchronous error');
+          }, 100);
+          break;
+          
+        case 'promise':
+          // Promise rejection
+          Promise.reject(new Error('This is a demo promise rejection'));
+          break;
+          
+        case 'network':
+          // Simulate network error
+          fetch('https://non-existent-domain-12345.com')
+            .then(response => response.json())
+            .then(data => console.log(data));
+          break;
+          
+        default:
+          setErrorDemo(null);
+      }
+    } catch (error) {
+      // For synchronous errors, they'll be caught here
+      // For async errors, they'll be caught by the global handlers
+      if (error instanceof Error) {
+        RendererErrorHandler.handleError({
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+          code: 'DEMO_ERROR',
+          isOperational: true,
+          context: { errorType: type }
+        });
+      }
     }
   };
-
-  const deleteProject = async (id: string) => {
-    setLoading(true);
-    try {
-      await ProjectService.delete(id);
-      setStatus(`Deleted project ${id}`);
-      loadProjects();
-    } catch (error: any) {
-      setStatus(`Error deleting project: ${error.message}`);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadProjects();
-  }, []);
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -73,99 +122,75 @@ function App() {
         <h1 className="text-2xl font-bold text-gray-800 mb-4">AI Character Council</h1>
         <p className="text-gray-600 mb-6">Speculative Fiction Character Management</p>
         
-        <div className="mb-6">
+        <div className="space-y-4">
           <button 
             onClick={testConnection}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded mr-2"
-            disabled={loading}
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded"
           >
-            Test Connection
+            Test Electron Connection
           </button>
           
-          <button 
-            onClick={loadProjects}
-            className="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded"
-            disabled={loading}
-          >
-            Refresh Projects
-          </button>
-        </div>
-
-        <div className="mb-6">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="projectName">
-            New Project Name
-          </label>
-          <div className="flex">
-            <input
-              id="projectName"
-              type="text"
-              value={projectName}
-              onChange={(e) => setProjectName(e.target.value)}
-              className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline flex-grow mr-2"
-              placeholder="Enter project name"
-              disabled={loading}
-            />
-            <button
-              onClick={createProject}
-              disabled={!projectName || loading}
-              className={`font-bold py-2 px-4 rounded ${
-                projectName && !loading
-                  ? 'bg-blue-500 hover:bg-blue-600 text-white' 
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }`}
-            >
-              Create
-            </button>
+          <div className="border-t border-gray-200 pt-4">
+            <h2 className="text-lg font-semibold mb-3">Error Handling Demo</h2>
+            <div className="grid grid-cols-2 gap-3">
+              <button 
+                onClick={() => triggerDemoError('sync')}
+                className={`${
+                  errorDemo === 'sync' ? 'bg-red-500' : 'bg-red-100'
+                } hover:bg-red-200 text-red-800 font-medium py-2 px-3 rounded text-sm`}
+              >
+                Trigger Sync Error
+              </button>
+              
+              <button 
+                onClick={() => triggerDemoError('async')}
+                className={`${
+                  errorDemo === 'async' ? 'bg-red-500' : 'bg-red-100'
+                } hover:bg-red-200 text-red-800 font-medium py-2 px-3 rounded text-sm`}
+              >
+                Trigger Async Error
+              </button>
+              
+              <button 
+                onClick={() => triggerDemoError('promise')}
+                className={`${
+                  errorDemo === 'promise' ? 'bg-red-500' : 'bg-red-100'
+                } hover:bg-red-200 text-red-800 font-medium py-2 px-3 rounded text-sm`}
+              >
+                Trigger Promise Rejection
+              </button>
+              
+              <button 
+                onClick={() => triggerDemoError('network')}
+                className={`${
+                  errorDemo === 'network' ? 'bg-red-500' : 'bg-red-100'
+                } hover:bg-red-200 text-red-800 font-medium py-2 px-3 rounded text-sm`}
+              >
+                Trigger Network Error
+              </button>
+            </div>
           </div>
         </div>
         
         {status && (
-          <div className="mb-6 text-sm text-gray-700 p-2 bg-gray-100 rounded">
+          <p className="mt-4 text-sm text-gray-700 p-2 bg-gray-100 rounded">
             {status}
-          </div>
+          </p>
         )}
-        
-        <div className="mt-6">
-          <h2 className="text-lg font-semibold mb-3">Your Projects</h2>
-          {loading ? (
-            <p className="text-gray-500 italic">Loading...</p>
-          ) : projects.length === 0 ? (
-            <p className="text-gray-500 italic">No projects found. Create your first project!</p>
-          ) : (
-            <ul className="divide-y divide-gray-200">
-              {projects.map(project => (
-                <li key={project.id} className="py-3 flex justify-between items-center">
-                  <div>
-                    <p className="font-medium">{project.name}</p>
-                    <p className="text-sm text-gray-500">{project.description || 'No description'}</p>
-                    <p className="text-xs text-gray-400">
-                      Updated: {new Date(project.updatedAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <div className="flex space-x-2">
-                    <button 
-                      onClick={() => alert(`View project ${project.id}`)}
-                      className="text-blue-500 hover:text-blue-700"
-                      disabled={loading}
-                    >
-                      View
-                    </button>
-                    <button 
-                      onClick={() => deleteProject(project.id)}
-                      className="text-red-500 hover:text-red-700"
-                      disabled={loading}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
       </div>
     </div>
   );
 }
 
-export default App;
+// Wrap the app in the error handling components
+function AppWithErrorHandling() {
+  return (
+    <ErrorBoundary fallback={(error, resetError) => <RootErrorFallback error={error} resetError={resetError} />}>
+      <ErrorProvider>
+        <App />
+      </ErrorProvider>
+    </ErrorBoundary>
+  );
+}
+
+export default AppWithErrorHandling;

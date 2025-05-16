@@ -89,5 +89,34 @@ contextBridge.exposeInMainWorld('electron', {
   settings: {
     get: () => ipcRenderer.invoke('settings:get'),
     update: (data: any) => ipcRenderer.invoke('settings:update', data)
-  }
+  },
+
+// Error handling
+reportError: (error: any) => ipcRenderer.invoke('report-error', error),
+onError: (callback: (error: any) => void) => {
+  const listener = (_event: any, error: any) => callback(error);
+  ipcRenderer.on('error', listener);
+  return () => {
+    ipcRenderer.removeListener('error', listener);
+  };
+},
+
+// Get application logs
+getLogs: (options: { limit?: number, minLevel?: string } = {}) => 
+  ipcRenderer.invoke('get-logs', options),
+
+// Add more API methods here as needed
 });
+
+// Add type definitions for window.electron
+declare global {
+interface Window {
+  electron: {
+    ping: () => Promise<string>;
+    reportError: (error: any) => Promise<{ received: boolean }>;
+    onError: (callback: (error: any) => void) => () => void;
+    getLogs: (options?: { limit?: number, minLevel?: string }) => Promise<any>;
+    // Add more methods here as they are implemented
+  };
+}
+}
