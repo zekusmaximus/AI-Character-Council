@@ -1,36 +1,37 @@
-// src/renderer/services/databaseService.ts
-
+if (!window.electron) {
+  throw new Error("Electron API is not available on window.");
+}
 // Project Services
 export const ProjectService = {
     getAll: async () => {
-      return await window.electron.projects.getAll();
+      return await window.electron!.projects.getAll();
     },
     
     getById: async (id: string) => {
-      return await window.electron.projects.getById(id);
+      return await window.electron!.projects.getById(id);
     },
     
     create: async (data: any) => {
-      return await window.electron.projects.create(data);
+      return await window.electron!.projects.create(data);
     },
     
     update: async (id: string, data: any) => {
-      return await window.electron.projects.update(id, data);
+      return await window.electron!.projects.update(id, data);
     },
     
     delete: async (id: string) => {
-      return await window.electron.projects.delete(id);
+      return await window.electron!.projects.delete(id);
     }
   };
   
   // Character Services
   export const CharacterService = {
     getAll: async (projectId: string) => {
-      return await window.electron.characters.getAll(projectId);
+      return await window.electron!.characters.getAll(projectId);
     },
     
     getById: async (id: string) => {
-      return await window.electron.characters.getById(id);
+      return await window.electron!.characters.getById(id);
     },
     
     create: async (data: any) => {
@@ -43,7 +44,7 @@ export const ProjectService = {
         data.characterSheet = JSON.stringify(data.characterSheet);
       }
       
-      return await window.electron.characters.create(data);
+      return await window.electron!.characters.create(data);
     },
     
     update: async (id: string, data: any) => {
@@ -56,11 +57,11 @@ export const ProjectService = {
         data.characterSheet = JSON.stringify(data.characterSheet);
       }
       
-      return await window.electron.characters.update(id, data);
+      return await window.electron!.characters.update(id, data);
     },
     
     delete: async (id: string) => {
-      return await window.electron.characters.delete(id);
+      return await window.electron!.characters.delete(id);
     },
     
     // Helper to parse JSON fields when retrieving character
@@ -96,7 +97,7 @@ export const ProjectService = {
   // Memory Services
   export const MemoryService = {
     getByCharacter: async (characterId: string) => {
-      const memories = await window.electron.memories.getByCharacter(characterId);
+      const memories = await window.electron!.memories.getByCharacter(characterId);
       
       // Parse metadata JSON
       return memories.map((memory: any) => {
@@ -118,7 +119,7 @@ export const ProjectService = {
         data.metadata = JSON.stringify(data.metadata);
       }
       
-      return await window.electron.memories.create(data);
+      return await window.electron!.memories.create(data);
     },
     
     update: async (id: string, data: any) => {
@@ -127,22 +128,22 @@ export const ProjectService = {
         data.metadata = JSON.stringify(data.metadata);
       }
       
-      return await window.electron.memories.update(id, data);
+      return await window.electron!.memories.update(id, data);
     },
     
     delete: async (id: string) => {
-      return await window.electron.memories.delete(id);
+      return await window.electron!.memories.delete(id);
     }
   };
   
   // Conversation Services
   export const ConversationService = {
     getAll: async (projectId: string) => {
-      return await window.electron.conversations.getAll(projectId);
+      return await window.electron!.conversations.getAll(projectId);
     },
     
     getById: async (id: string) => {
-      const conversation = await window.electron.conversations.getById(id);
+      const conversation = await window.electron!.conversations.getById(id);
       
       // Parse message metadata
       if (conversation && conversation.messages) {
@@ -163,15 +164,15 @@ export const ProjectService = {
     },
     
     create: async (data: any) => {
-      return await window.electron.conversations.create(data);
+      return await window.electron!.conversations.create(data);
     },
     
     update: async (id: string, data: any) => {
-      return await window.electron.conversations.update(id, data);
+      return await window.electron!.conversations.update(id, data);
     },
     
     delete: async (id: string) => {
-      return await window.electron.conversations.delete(id);
+      return await window.electron!.conversations.delete(id);
     },
     
     createMessage: async (data: any) => {
@@ -180,18 +181,18 @@ export const ProjectService = {
         data.metadata = JSON.stringify(data.metadata);
       }
       
-      return await window.electron.messages.create(data);
+      return await window.electron!.messages.create(data);
     }
   };
   
   // Timeline Services
   export const TimelineService = {
     getAll: async (projectId: string) => {
-      return await window.electron.timelines.getAll(projectId);
+      return await window.electron!.timelines.getAll(projectId);
     },
     
     getById: async (id: string) => {
-      const timeline = await window.electron.timelines.getById(id);
+      const timeline = await window.electron!.timelines.getById(id);
       
       // Parse event metadata
       if (timeline && timeline.events) {
@@ -212,15 +213,15 @@ export const ProjectService = {
     },
     
     create: async (data: any) => {
-      return await window.electron.timelines.create(data);
+      return await window.electron!.timelines.create(data);
     },
     
     update: async (id: string, data: any) => {
-      return await window.electron.timelines.update(id, data);
+      return await window.electron!.timelines.update(id, data);
     },
     
     delete: async (id: string) => {
-      return await window.electron.timelines.delete(id);
+      return await window.electron!.timelines.delete(id);
     },
     
     createEvent: async (data: any) => {
@@ -229,7 +230,7 @@ export const ProjectService = {
         data.metadata = JSON.stringify(data.metadata);
       }
       
-      return await window.electron.events.create(data);
+      return await window.electron!.events.create(data);
     },
     
     updateEvent: async (id: string, data: any) => {
@@ -238,71 +239,71 @@ export const ProjectService = {
         data.metadata = JSON.stringify(data.metadata);
       }
       
-      return await window.electron.events.update(id, data);
+      return await window.electron!.events.update(id, data);
     },
     
     deleteEvent: async (id: string) => {
-      return await window.electron.events.delete(id);
+      return await window.electron!.events.delete(id);
     },
     
     linkCharacterToEvent: async (data: any) => {
-      return await window.electron.characterEventLinks.create(data);
+      return await window.electron!.characterEventLinks.create(data);
     },
     
     unlinkCharacterFromEvent: async (id: string) => {
-      return await window.electron.characterEventLinks.delete(id);
+      return await window.electron!.characterEventLinks.delete(id);
     }
   };
   
   // Note Services
   export const NoteService = {
     getAll: async (projectId: string) => {
-      return await window.electron.notes.getAll(projectId);
+      return await window.electron!.notes.getAll(projectId);
     },
     
     getById: async (id: string) => {
-      return await window.electron.notes.getById(id);
+      return await window.electron!.notes.getById(id);
     },
     
     create: async (data: any) => {
-      return await window.electron.notes.create(data);
+      return await window.electron!.notes.create(data);
     },
     
     update: async (id: string, data: any) => {
-      return await window.electron.notes.update(id, data);
+      return await window.electron!.notes.update(id, data);
     },
     
     delete: async (id: string) => {
-      return await window.electron.notes.delete(id);
+      return await window.electron!.notes.delete(id);
     }
   };
   
   // Tag Services
   export const TagService = {
     getAll: async (projectId: string) => {
-      return await window.electron.tags.getAll(projectId);
+      return await window.electron!.tags.getAll(projectId);
     },
     
     create: async (data: any) => {
-      return await window.electron.tags.create(data);
+      return await window.electron!.tags.create(data);
     },
     
     update: async (id: string, data: any) => {
-      return await window.electron.tags.update(id, data);
+      return await window.electron!.tags.update(id, data);
     },
     
     delete: async (id: string) => {
-      return await window.electron.tags.delete(id);
+      return await window.electron!.tags.delete(id);
     }
   };
   
   // Settings Services
   export const SettingsService = {
     get: async () => {
-      return await window.electron.settings.get();
+      return await window.electron!.settings.get();
     },
     
     update: async (data: any) => {
-      return await window.electron.settings.update(data);
+      return await window.electron!.settings.update(data);
     }
   };

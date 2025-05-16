@@ -1,4 +1,9 @@
-import { Prisma } from '@prisma/client';
+import {
+  PrismaClientKnownRequestError,
+  PrismaClientValidationError,
+  PrismaClientInitializationError,
+  PrismaClientRustPanicError
+} from '@prisma/client/runtime/library';
 import { DatabaseError, NotFoundError, ValidationError } from '../../shared/utils/errors/AppError';
 import { createLogger } from '../../shared/utils/logger';
 
@@ -7,16 +12,19 @@ const logger = createLogger('DatabaseErrorHandler');
 /**
  * Handle and standardize Prisma database errors
  */
-export function handleDatabaseError(error: any, options: {
-  operation?: string;
-  table?: string;
-  data?: any;
-  id?: string | number;
-} = {}): never {
+export function handleDatabaseError(
+  error: any,
+  options: {
+    operation?: string;
+    table?: string;
+    data?: any;
+    id?: string | number;
+  } = {}
+): never {
   const { operation = 'database operation', table, data, id } = options;
   
   // Handle specific Prisma error types
-  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+  if (error instanceof PrismaClientKnownRequestError) {
     // Handle not found errors (P2025)
     if (error.code === 'P2025') {
       const entity = table || 'Record';
@@ -102,8 +110,7 @@ export function handleDatabaseError(error: any, options: {
     );
   }
   
-  // Handle validation errors
-  if (error instanceof Prisma.PrismaClientValidationError) {
+  if (error instanceof PrismaClientValidationError) {
     logger.error(`Validation error during ${operation}`, error, {
       table,
       data: sanitizeData(data)
@@ -124,7 +131,7 @@ export function handleDatabaseError(error: any, options: {
   }
   
   // Handle initialization errors
-  if (error instanceof Prisma.PrismaClientInitializationError) {
+  if (error instanceof PrismaClientInitializationError) {
     logger.error('Database initialization error', error);
     
     throw new DatabaseError(
@@ -142,7 +149,7 @@ export function handleDatabaseError(error: any, options: {
   }
   
   // Handle general Prisma errors
-  if (error instanceof Prisma.PrismaClientRustPanicError) {
+  if (error instanceof PrismaClientRustPanicError) {
     logger.error('Critical database error (Rust panic)', error);
     
     throw new DatabaseError(

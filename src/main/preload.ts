@@ -108,15 +108,3 @@ getLogs: (options: { limit?: number, minLevel?: string } = {}) =>
 // Add more API methods here as needed
 });
 
-// Add type definitions for window.electron
-declare global {
-interface Window {
-  electron: {
-    ping: () => Promise<string>;
-    reportError: (error: any) => Promise<{ received: boolean }>;
-    onError: (callback: (error: any) => void) => () => void;
-    getLogs: (options?: { limit?: number, minLevel?: string }) => Promise<any>;
-    // Add more methods here as they are implemented
-  };
-}
-}

@@ -1,13 +1,20 @@
 import { createLogger } from '../../shared/utils/logger';
+import type { ElectronAPI } from '../types/electron';
+// Define a shared ElectronAPI interface for type safety
+
+// Define the RendererErrorData type for error event payloads
+export interface RendererErrorData {
+  name: string;
+  message: string;
+  stack?: string;
+  code?: string;
+  context?: any;
+}
 
 // Extend the window.electron type to include onError and reportError
 declare global {
   interface Window {
-    electron?: {
-      getLogs?: (params: { limit: number; minLevel: string }) => Promise<any[]>;
-      onError?: (callback: (errorData: any) => void) => void;
-      reportError?: (error: any) => void;
-    };
+    electron?: ElectronAPI; // Use the defined ElectronAPI interface
   }
 }
 
@@ -70,7 +77,7 @@ export class RendererErrorHandler {
     
     // Listen for error events from the main process
     if (window.electron?.onError) {
-      window.electron.onError((errorData) => {
+      window.electron.onError((errorData: RendererErrorData) => {
         logger.warn('Error received from main process', errorData);
         RendererErrorHandler.handleError(errorData);
       });

@@ -1,0 +1,63 @@
+#!/usr/bin/env node
+
+/**
+ * Version Bumper for AI Character Council
+ * 
+ * Usage: node scripts/bump-version.js [major|minor|patch]
+ */
+
+const fs = require('fs');
+const path = require('path');
+const { execSync } = require('child_process');
+
+// Get version type from command line argument
+const versionType = process.argv[2] || 'patch';
+
+if (!['major', 'minor', 'patch'].includes(versionType)) {
+  console.error('Invalid version type. Use major, minor, or patch.');
+  process.exit(1);
+}
+
+// Read the current package.json
+const packageJsonPath = path.join(__dirname, '..', 'package.json');
+const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+const currentVersion = packageJson.version;
+
+// Parse the version
+const [major, minor, patch] = currentVersion.split('.').map(Number);
+
+// Calculate new version
+let newVersion;
+switch(versionType) {
+  case 'major':
+    newVersion = `${major + 1}.0.0`;
+    break;
+  case 'minor':
+    newVersion = `${major}.${minor + 1}.0`;
+    break;
+  case 'patch':
+    newVersion = `${major}.${minor}.${patch + 1}`;
+    break;
+}
+
+// Update package.json
+packageJson.version = newVersion;
+fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
+
+console.log(`Version bumped from ${currentVersion} to ${newVersion}`);
+
+// Create a git tag
+try {
+  // First commit the version change
+  execSync(`git add package.json`);
+  execSync(`git commit -m "Bump version to ${newVersion}"`);
+  
+  // Create and push the tag
+  execSync(`git tag -a v${newVersion} -m "Version ${newVersion}"`);
+  console.log(`Git tag v${newVersion} created.`);
+  
+  console.log('Push the changes and tag with:');
+  console.log(`  git push && git push origin v${newVersion}`);
+} catch (error) {
+  console.error('Error creating git tag:', error.message);
+}

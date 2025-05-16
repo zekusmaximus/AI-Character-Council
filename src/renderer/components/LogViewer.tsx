@@ -1,17 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLogger } from '../utils/LoggerProvider';
 
-// Extend the window interface to include the electron property
-declare global {
-  interface Window {
-    electron?: {
-      getLogs?: (params: { limit: number; minLevel: string }) => Promise<any[]>;
-      onError?: (callback: (errorData: any) => void) => void;
-      reportError?: (error: any) => void;
-      // Add other electron APIs here if needed
-    };
-  }
-}
+
+// Remove duplicate Window interface extension; defined elsewhere in the project
 
 interface LogEntry {
   timestamp: string;
