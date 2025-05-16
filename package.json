@@ -53,13 +53,41 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
+  
   "lint-staged": {
-  "*.{js,jsx,ts,tsx}": [
-    "eslint --fix",
-    "prettier --write"
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,css,scss,md}": [
+      "prettier --write"
+    ]
+  },
+
+  "build": {
+  "appId": "com.yourname.ai-character-council",
+  "productName": "AI Character Council",
+  "files": [
+    "build/**/*",
+    "node_modules/**/*"
   ],
-  "*.{json,css,scss,md}": [
-    "prettier --write"
-  ]
+  "directories": {
+    "buildResources": "assets"
+  },
+  "mac": {
+    "category": "public.app-category.developer-tools"
+  },
+  "win": {
+    "target": [
+      "nsis"
+    ]
+  },
+  "linux": {
+    "target": [
+      "deb",
+      "AppImage"
+    ],
+    "category": "Development"
+  }
 }
 }
