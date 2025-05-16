@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron';
-import { createLogger } from '../shared/utils/logger';
-import { AppError } from '../shared/errors/AppError';
-import { ErrorHandler } from './error/ErrorHandler';
+import { createLogger } from '../../shared/utils/logger';
+import { AppError } from '../../shared/utils/errors/AppError';
+import { ErrorHandler } from '../error/ErrorHandler';
 
 const logger = createLogger('IpcHandler');
 
@@ -78,13 +78,13 @@ export function initCoreIpcHandlers(): void {
   });
   
   // Handler to get application logs
-  registerIpcHandler('get-logs', async (event, options: { limit?: number, minLevel?: string } = {}) => {
+  registerIpcHandler('get-logs', async () => {
     // Implementation will depend on the logging system
     return { message: 'Log retrieval not implemented yet' };
   });
   
   // Handler to report an error from the renderer
-  registerIpcHandler('report-error', (event, errorData: any) => {
+  registerIpcHandler('report-error', (errorData: any) => {
     const { message, stack, code, context } = errorData;
     
     // Create an AppError from the data

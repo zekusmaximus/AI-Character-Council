@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { ErrorBoundary } from './error/ErrorBoundary';
 import { ErrorProvider } from './components';
 import { RendererErrorHandler } from './error/RendererErrorHandler';
-import { createLogger } from '../shared/utils/logger';
+
 // Create a custom fallback UI for the root error boundary
 const RootErrorFallback = ({ error, resetError }: { error: Error, resetError: () => void }) => (
   <div className="min-h-screen bg-red-50 flex items-center justify-center p-4">

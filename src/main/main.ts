@@ -77,7 +77,7 @@ async function createWindow() {
   });
 
   // Handle window creation errors
-  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
+  mainWindow.webContents.on('did-fail-load', (errorCode, errorDescription) => {
     logger.error('Window failed to load', { errorCode, errorDescription });
     if (mainWindow) {
       mainWindow.webContents.openDevTools();

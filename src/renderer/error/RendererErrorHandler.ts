@@ -1,5 +1,16 @@
 import { createLogger } from '../../shared/utils/logger';
 
+// Extend the window.electron type to include onError and reportError
+declare global {
+  interface Window {
+    electron?: {
+      getLogs?: (params: { limit: number; minLevel: string }) => Promise<any[]>;
+      onError?: (callback: (errorData: any) => void) => void;
+      reportError?: (error: any) => void;
+    };
+  }
+}
+
 // Set up logger for the renderer process
 const logger = createLogger('RendererErrorHandler');
 
