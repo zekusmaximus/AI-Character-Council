@@ -2,7 +2,7 @@ import { Project, Prisma } from '@prisma/client';
 import { BaseRepository } from './BaseRepository';
 import { projectSchema, ProjectInput } from '../validation/schemas';
 import { createLogger } from '../utils/logger';
-import { handleDatabaseError } from '../../main/database/databaseErrorHnadler';
+import { handleDatabaseError } from '../../main/database/databaseErrorHandler';
 
 const logger = createLogger('ProjectRepository');
 

@@ -2,7 +2,7 @@ import { CharacterMemory, Prisma } from '@prisma/client';
 import { BaseRepository } from './BaseRepository';
 import { characterMemorySchema, CharacterMemoryInput } from '../validation/schemas';
 import { createLogger } from '../utils/logger';
-import { handleDatabaseError } from '../../main/database/databaseErrorHnadler';
+import { handleDatabaseError } from '../../main/database/databaseErrorHandler';
 
 const logger = createLogger('MemoryRepository');
 

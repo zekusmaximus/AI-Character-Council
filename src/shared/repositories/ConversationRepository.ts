@@ -7,7 +7,7 @@ import {
   ConversationMessageInput 
 } from '../validation/schemas';
 import { createLogger } from '../utils/logger';
-import { handleDatabaseError } from '../../main/database/databaseErrorHnadler';
+import { handleDatabaseError } from '../../main/database/databaseErrorHandler';
 
 const logger = createLogger('ConversationRepository');
 

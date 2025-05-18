@@ -16,7 +16,7 @@ import {
   validateUserSettings
 } from '../../shared/validation';
 import { ValidationUtils } from '../../shared/validation/utils';
-import { handleDatabaseError } from '../database/databaseErrorHnadler';
+import { handleDatabaseError } from '../database/databaseErrorHandler';
 
 const logger = createLogger('DatabaseHandlers');
 

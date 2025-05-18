@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { prisma } from '../../main/services/database';
-import { handleDatabaseError } from '../../main/database/databaseErrorHnadler';
+import { handleDatabaseError } from '../../main/database/databaseErrorHandler';
 import { createLogger } from '../utils/logger';
 import { z } from 'zod';
 
