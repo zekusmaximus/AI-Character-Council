@@ -162,3 +162,26 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
     }
   }
 }
+
+// Add to BaseRepository.ts
+protected parseJsonField<T>(jsonString: string | null | undefined, defaultValue: T): T {
+  if (!jsonString) return defaultValue;
+  
+  try {
+    return JSON.parse(jsonString) as T;
+  } catch (error) {
+    this.logger.error(`Failed to parse JSON field in ${this.tableName}`, error);
+    return defaultValue;
+  }
+}
+
+protected stringifyJsonField<T>(data: T | null | undefined): string {
+  if (data === null || data === undefined) return '{}';
+  
+  try {
+    return JSON.stringify(data);
+  } catch (error) {
+    this.logger.error(`Failed to stringify JSON field in ${this.tableName}`, error);
+    return '{}';
+  }
+}
