@@ -38,22 +38,32 @@ export const characterSchema = z.object({
   projectId: z.string().uuid(),
   name: z.string().min(1, "Character name is required").max(100, "Character name is too long"),
   bio: z.string().max(10000, "Bio is too long").optional().nullable(),
-  personalityTraits: z.string()
-    .refine(
-      (val) => !val || (() => { try { JSON.parse(val); return true; } catch { return false; } })(),
-      { message: "Personality traits must be valid JSON or empty" }
-    )
-    .optional()
-    .nullable(),
-  characterSheet: z.string()
-    .refine(
-      (val) => !val || (() => { try { JSON.parse(val); return true; } catch { return false; } })(),
-      { message: "Character sheet must be valid JSON or empty" }
-    )
-    .optional()
-    .nullable(),
   image: z.string().max(1000, "Image path/URL is too long").optional().nullable(),
+  // personalityTraits and characterAttributes (formerly characterSheet) are now relational
+  // and will be handled by their own schemas and repository logic if direct input is needed.
+  // For create/update operations, they will be part of the nested write.
+  // If direct validation of these as input arrays is needed later, define schemas here.
+  // For now, removing them from direct characterSchema input for simplicity,
+  // as the CharacterRepositoryV2 will handle their creation/update.
+  // TODO: Re-evaluate if these should be part of CharacterInput, e.g.,
+  // personalityTraits: z.array(z.object({ name: z.string(), value: z.string() })).optional(),
+  // characterAttributes: z.array(z.object({ name: z.string(), value: z.string() })).optional(),
 });
+
+// Schema for PersonalityTrait (as input, an array of these would be used)
+export const personalityTraitInputSchema = z.object({
+  name: z.string().min(1, "Trait name is required"),
+  value: z.string().min(1, "Trait value is required"),
+});
+export type PersonalityTraitInput = z.infer<typeof personalityTraitInputSchema>;
+
+// Schema for CharacterAttribute (as input, an array of these would be used)
+export const characterAttributeInputSchema = z.object({
+  name: z.string().min(1, "Attribute name is required"),
+  value: z.string().min(1, "Attribute value is required"),
+});
+export type CharacterAttributeInput = z.infer<typeof characterAttributeInputSchema>;
+
 
 // Character version schema
 export const characterVersionSchema = z.object({

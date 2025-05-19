@@ -32,8 +32,6 @@ model Character {
   projectId        String
   name             String
   bio              String?
-  personalityTraits String?    // JSON string containing character personality data
-  characterSheet   String?     // JSON string containing customizable character attributes
   image            String?     // Path or URL to character image
   createdAt        DateTime    @default(now())
   updatedAt        DateTime    @updatedAt
@@ -44,6 +42,34 @@ model Character {
   characterMemories  CharacterMemory[]
   messages           ConversationMessage[]
   characterEventLinks CharacterEventLink[]
+  personalityTraits  PersonalityTrait[]
+  characterAttributes CharacterAttribute[]
+}
+
+model PersonalityTrait {
+  id          String   @id @default(uuid())
+  characterId String
+  name        String   // e.g., "Openness", "Conscientiousness"
+  value       String   // Could be a numerical score, a description, etc.
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@unique([characterId, name]) // Assuming a character has a unique value for each trait name
+}
+
+model CharacterAttribute {
+  id          String   @id @default(uuid())
+  characterId String
+  name        String   // The name of the custom attribute (e.g., "Strength", "Magic Affinity")
+  value       String   // The value of the custom attribute
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  
+  @@unique([characterId, name]) // Assuming a character has a unique value for each attribute name
 }
 
 model CharacterVersion {
