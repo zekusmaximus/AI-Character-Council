@@ -1,7 +1,7 @@
 // src/main/ipc/databaseHandlers.ts
 
 import { ipcMain } from 'electron';
-import { prisma } from '../services/database';
+import { prisma } from '../database/database';
 import { createLogger } from '../../shared/utils/logger';
 import { 
   validateProject,
@@ -184,15 +184,6 @@ export function setupDatabaseHandlers() {
       // Handle JSON fields
       let dataToCreate = { ...validatedData };
       
-      // Ensure JSON fields are properly stringified
-      if (dataToCreate.personalityTraits && typeof dataToCreate.personalityTraits !== 'string') {
-        dataToCreate.personalityTraits = ValidationUtils.stringifyJSON(dataToCreate.personalityTraits);
-      }
-      
-      if (dataToCreate.characterSheet && typeof dataToCreate.characterSheet !== 'string') {
-        dataToCreate.characterSheet = ValidationUtils.stringifyJSON(dataToCreate.characterSheet);
-      }
-      
       // Create character
       return await prisma.character.create({
         data: dataToCreate
@@ -219,15 +210,6 @@ export function setupDatabaseHandlers() {
       
       // Handle JSON fields
       let dataToSave = { ...dataToUpdate };
-      
-      // Ensure JSON fields are properly stringified
-      if (dataToSave.personalityTraits && typeof dataToSave.personalityTraits !== 'string') {
-        dataToSave.personalityTraits = ValidationUtils.stringifyJSON(dataToSave.personalityTraits);
-      }
-      
-      if (dataToSave.characterSheet && typeof dataToSave.characterSheet !== 'string') {
-        dataToSave.characterSheet = ValidationUtils.stringifyJSON(dataToSave.characterSheet);
-      }
       
       // Update character
       return await prisma.character.update({

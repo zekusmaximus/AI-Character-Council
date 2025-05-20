@@ -37,7 +37,7 @@ export function registerIpcHandler(channel: string, handlerFn: (...args: any[]) 
             message: error.message,
             code: error.code,
             isOperational: error.isOperational,
-            validationErrors: error.validationErrors,
+            validationErrors: error.context.validationErrors,
             context: error.context
           }
         };
