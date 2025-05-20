@@ -1,4 +1,4 @@
-import { createLogger } from '../../shared/utils/logger';
+import { createLogger } from '../../shared/utils/logger.ts';
 import type { ElectronAPI } from '../types/electron';
 // Define a shared ElectronAPI interface for type safety
 

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, ReactNode } from 'react';
-import { Logger } from '../../shared/utils/logger';
+import { Logger } from '../../shared/utils/logger.ts';
 
 // Create the context
 interface LoggerContextType {

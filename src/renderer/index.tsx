@@ -4,7 +4,7 @@ import App from './App';
 import './index.css';
 
 // Import error handling
-import { createLogger } from '../shared/utils/logger';
+import { createLogger } from '../shared/utils/logger.ts';
 
 // Configure renderer logger
 const logger = createLogger('Renderer');
