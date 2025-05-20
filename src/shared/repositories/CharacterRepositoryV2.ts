@@ -39,13 +39,54 @@ export class CharacterRepositoryV2 extends BaseRepository<
   /**
    * Get a character with related data
    */
-  async getByIdWithRelations(id: string): Promise<Character & {
-    characterMemories: any[];
-    characterVersions: any[];
-    characterEventLinks: any[];
-    personalityTraits: any[]; // TODO: Define proper type once PersonalityTrait model is finalized in Prisma Client
-    characterAttributes: any[]; // TODO: Define proper type once CharacterAttribute model is finalized in Prisma Client
-  }> {
+import { Character, Prisma, PersonalityTrait, CharacterAttribute } from '@prisma/client';
+import { BaseRepository } from './BaseRepository';
+import { characterSchema, CharacterInput, PersonalityTraitInput, CharacterAttributeInput } from '../validation/schemas';
+import { createLogger } from '../utils/logger';
+import { handleDatabaseError } from '../../main/database/databaseErrorHandler';
+
+const logger = createLogger('CharacterRepositoryV2');
+
+/**
+ * Repository for Character-related database operations using BaseRepository
+ */
+export class CharacterRepositoryV2 extends BaseRepository<
+  Character,
+  CharacterInput,
+  Partial<CharacterInput>
+> {
+  constructor() {
+    super('character', characterSchema);
+  }
+  
+  /**
+   * Get all characters for a project
+   */
+  async getAllByProject(projectId: string): Promise<Character[]> {
+    try {
+      return await this.prisma.character.findMany({
+        where: { projectId },
+        orderBy: { name: 'asc' }
+      });
+    } catch (error) {
+      return handleDatabaseError(error, {
+        operation: 'getAllByProject',
+        table: this.tableName,
+        data: { projectId }
+      });
+    }
+  }
+  
+  /**
+   * Get a character with related data
+   */
+  async getByIdWithRelations(id: string): Promise<(Character & {
+    characterMemories: Prisma.CharacterMemoryGetPayload<{}>[];
+    characterVersions: Prisma.CharacterVersionGetPayload<{}>[];
+    characterEventLinks: Prisma.CharacterEventLinkGetPayload<{ include: { event: true } }>[];
+    personalityTraits: PersonalityTrait[];
+    characterAttributes: CharacterAttribute[];
+  }) | null> {
     try {
       const result = await this.prisma.character.findUnique({
         where: { id },
@@ -61,16 +102,17 @@ export class CharacterRepositoryV2 extends BaseRepository<
           characterAttributes: true
         }
       });
-      
       if (!result) {
-        return handleDatabaseError(new Error('Character not found'), {
-          operation: 'getByIdWithRelations',
-          table: this.tableName,
-          id
-        });
+        logger.warn(`Character with id ${id} not found for getByIdWithRelations.`);
+        return null;
       }
-      
-      return result;
+      return result as (Character & { // Type assertion to satisfy the detailed return type
+        characterMemories: Prisma.CharacterMemoryGetPayload<{}>[];
+        characterVersions: Prisma.CharacterVersionGetPayload<{}>[];
+        characterEventLinks: Prisma.CharacterEventLinkGetPayload<{ include: { event: true } }>[];
+        personalityTraits: PersonalityTrait[];
+        characterAttributes: CharacterAttribute[];
+      });
     } catch (error) {
       return handleDatabaseError(error, {
         operation: 'getByIdWithRelations',
@@ -111,35 +153,36 @@ export class CharacterRepositoryV2 extends BaseRepository<
   /**
    * Handle special case for character creation with personality traits
    */
-  async create(data: CharacterInput): Promise<Character> {
+  async create(data: CharacterInput): Promise<Character & { personalityTraits: PersonalityTrait[], characterAttributes: CharacterAttribute[] }> {
     try {
-      // Validate the data
       const validatedData = this.validate(data, 'create');
+      const { personalityTraits, characterAttributes, ...characterCoreData } = validatedData;
+
+      const createData: Prisma.CharacterCreateInput = {
+        ...characterCoreData,
+      };
+
+      if (personalityTraits && personalityTraits.length > 0) {
+        createData.personalityTraits = {
+          create: personalityTraits.map((pt: PersonalityTraitInput) => ({ name: pt.name, value: pt.value })),
+        };
+      }
+
+      if (characterAttributes && characterAttributes.length > 0) {
+        createData.characterAttributes = {
+          create: characterAttributes.map((ca: CharacterAttributeInput) => ({ name: ca.name, value: ca.value })),
+        };
+      }
       
-      // Handle JSON fields
-      let dataToCreate = { ...validatedData };
-      
-      // TODO: Adapt this logic for new relational structure
-      // The following lines for personalityTraits and characterSheet are now incorrect
-      // and need to be replaced with logic to create related records.
-      // For example, using Prisma's nested writes:
-      // personalityTraits: { create: validatedData.personalityTraits.map(pt => ({ name: pt.name, value: pt.value })) }
-      // Stringify JSON fields if they're objects
-      // if (dataToCreate.personalityTraits && typeof dataToCreate.personalityTraits !== 'string') {
-      //   dataToCreate.personalityTraits = JSON.stringify(dataToCreate.personalityTraits);
-      // }
-      //
-      // if (dataToCreate.characterSheet && typeof dataToCreate.characterSheet !== 'string') {
-      //   dataToCreate.characterSheet = JSON.stringify(dataToCreate.characterSheet);
-      // }
-      
-      // Create the character
-      // @ts-ignore // TODO: Remove ts-ignore once dataToCreate is correctly typed for new relations
       return await this.prisma.character.create({
-        data: dataToCreate // This will likely cause a type error until CharacterInput and this logic are updated
+        data: createData,
+        include: {
+          personalityTraits: true,
+          characterAttributes: true,
+        },
       });
-    } catch (error) {
-      if (typeof error === 'object' && error !== null && 'name' in error && (error as any).name === 'ValidationError') {
+    } catch (error: any) {
+      if (error.name === 'ValidationError') {
         throw error; // Re-throw validation errors
       }
       
@@ -156,35 +199,73 @@ export class CharacterRepositoryV2 extends BaseRepository<
    */
   async update(id: string, data: Partial<CharacterInput>): Promise<Character> {
     try {
-      // Validate the data
+  async update(id: string, data: Partial<CharacterInput>): Promise<Character & { personalityTraits: PersonalityTrait[], characterAttributes: CharacterAttribute[] }> {
+    try {
+      // Ensure 'id' is part of the data for validation, even if not directly used in `dataToUpdate`
       const validatedData = this.validate({ ...data, id }, 'update');
-      
-      // Remove id from the data to update
-      const { id: _, ...dataToUpdate } = validatedData;
-      
-      // Handle JSON fields
-      let dataToSave = { ...dataToUpdate };
-      
-      // TODO: Adapt this logic for new relational structure
-      // The following lines for personalityTraits and characterSheet are now incorrect
-      // and need to be replaced with logic to update/create/delete related records.
-      // Stringify JSON fields if they're objects
-      // if (dataToSave.personalityTraits && typeof dataToSave.personalityTraits !== 'string') {
-      //   dataToSave.personalityTraits = JSON.stringify(dataToSave.personalityTraits);
-      // }
-      //
-      // if (dataToSave.characterSheet && typeof dataToSave.characterSheet !== 'string') {
-      //   dataToSave.characterSheet = JSON.stringify(dataToSave.characterSheet);
-      // }
-      
-      // Update the character
-      // @ts-ignore // TODO: Remove ts-ignore once dataToSave is correctly typed for new relations
-      return await this.prisma.character.update({
-        where: { id },
-        data: dataToSave // This will likely cause a type error until CharacterInput and this logic are updated
+      const { id: validatedId, personalityTraits, characterAttributes, ...characterCoreData } = validatedData;
+
+      // Transaction to ensure atomicity
+      return await this.prisma.$transaction(async (tx) => {
+        // 1. Update core character data
+        // We only update if there's actual core data to update.
+        const coreDataKeys = Object.keys(characterCoreData);
+        let charUpdatePromise;
+        if (coreDataKeys.length > 0 && Object.values(characterCoreData).some(v => v !== undefined)) {
+             charUpdatePromise = tx.character.update({
+                where: { id },
+                data: characterCoreData,
+            });
+        } else {
+            // If no core data, fetch the character to ensure it exists before relation updates
+            charUpdatePromise = tx.character.findUniqueOrThrow({ where: { id }});
+        }
+        
+        const updatedCoreCharacter = await charUpdatePromise;
+
+        // 2. Handle personalityTraits: Delete existing and create new ones if provided
+        if (personalityTraits !== undefined) { // Check if the field was provided, even if empty array
+          await tx.personalityTrait.deleteMany({ where: { characterId: id } });
+          if (personalityTraits.length > 0) {
+            await tx.personalityTrait.createMany({
+              data: personalityTraits.map((pt: PersonalityTraitInput) => ({
+                characterId: id,
+                name: pt.name,
+                value: pt.value,
+              })),
+              skipDuplicates: true, // Good for resilience, though with prior delete, less critical
+            });
+          }
+        }
+
+        // 3. Handle characterAttributes: Delete existing and create new ones if provided
+        if (characterAttributes !== undefined) { // Check if the field was provided
+          await tx.characterAttribute.deleteMany({ where: { characterId: id } });
+          if (characterAttributes.length > 0) {
+            await tx.characterAttribute.createMany({
+              data: characterAttributes.map((ca: CharacterAttributeInput) => ({
+                characterId: id,
+                name: ca.name,
+                value: ca.value,
+              })),
+              skipDuplicates: true,
+            });
+          }
+        }
+        
+        // 4. Fetch the final character with updated relations
+        // Use findUniqueOrThrow to ensure character exists, as it should.
+        return tx.character.findUniqueOrThrow({
+          where: { id },
+          include: {
+            personalityTraits: true,
+            characterAttributes: true,
+          },
+        });
       });
-    } catch (error) {
-      if (typeof error === 'object' && error !== null && 'name' in error && (error as any).name === 'ValidationError') {
+
+    } catch (error: any) {
+      if (error.name === 'ValidationError') {
         throw error; // Re-throw validation errors
       }
       
@@ -197,47 +278,4 @@ export class CharacterRepositoryV2 extends BaseRepository<
     }
   }
   
-  /**
-   * Parse character JSON fields
-   * Utility method to parse JSON fields after retrieval
-   */
-  // TODO: This method is likely no longer needed as relations are handled by Prisma.
-  // Evaluate if any specific parsing logic from here needs to be moved elsewhere
-  // or if the method can be entirely removed.
-  // parseCharacter(character: Character): Character & {
-  //   personalityTraits: any;
-  //   characterSheet: any;
-  // } {
-  //   if (!character) return character as any;
-  //
-  //   const parsed = { ...character };
-  //
-  //   // Parse personality traits
-  //   if (parsed.personalityTraits && typeof parsed.personalityTraits === 'string') {
-  //     try {
-  //       (parsed as any).personalityTraits = JSON.parse(parsed.personalityTraits);
-  //     } catch (error) {
-  //       logger.error('Failed to parse personalityTraits JSON', {
-  //         error,
-  //         characterId: parsed.id
-  //       });
-  //       (parsed as any).personalityTraits = {};
-  //     }
-  //   }
-  //
-  //   // Parse character sheet
-  //   if (parsed.characterSheet && typeof parsed.characterSheet === 'string') {
-  //     try {
-  //       (parsed as any).characterSheet = JSON.parse(parsed.characterSheet);
-  //     } catch (error) {
-  //       logger.error('Failed to parse characterSheet JSON', {
-  //         error,
-  //         characterId: parsed.id
-  //       });
-  //       (parsed as any).characterSheet = {};
-  //     }
-  //   }
-  //
-  //   return parsed as any;
-  // }
 }
