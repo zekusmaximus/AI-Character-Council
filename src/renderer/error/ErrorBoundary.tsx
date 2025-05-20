@@ -1,6 +1,6 @@
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { createLogger } from '../../shared/utils/logger';
+import { createLogger } from '../../shared/utils/logger.ts';
 import { RendererErrorHandler } from './RendererErrorHandler';
 
 const logger = createLogger('ErrorBoundary');
