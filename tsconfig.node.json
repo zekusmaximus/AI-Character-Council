@@ -5,7 +5,10 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true  // Add this line
+    "esModuleInterop": true,
+    "rootDir": "src",
+    "outDir": "dist/main",
+    "baseUrl": "./src"
   },
-  "include": ["vite.config.ts"]
+  "include": ["src/main/**/*.ts", "src/shared/**/*.ts", "electron-*.js", "vite.config.ts"]
 }
