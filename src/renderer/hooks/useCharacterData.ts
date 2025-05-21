@@ -63,9 +63,9 @@ export function useCharacter(characterId: string | null) {
     return updateCharacter({ personalityTraits });
   };
 
-  // Function to update just the character sheet
-  const updateCharacterSheet = async (characterSheet: any): Promise<boolean> => {
-    return updateCharacter({ characterSheet });
+  // Function to update character attributes
+  const updateCharacterAttributes = async (characterAttributes: any): Promise<boolean> => {
+    return updateCharacter({ characterAttributes });
   };
 
   return {

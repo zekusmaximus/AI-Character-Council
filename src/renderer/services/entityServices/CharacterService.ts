@@ -44,8 +44,7 @@ export class CharacterService {
       
       // Parse JSON fields
       return data ? parseJsonFields(data, {
-        personalityTraits: PersonalityTraitsField,
-        characterSheet: CharacterSheetField
+        personalityTraits: PersonalityTraitsField
       }) : null;
     } catch (error) {
       logger.error(`Failed to get character ${id}`, error);
