@@ -44,7 +44,7 @@ async function initApp() {
     initCoreIpcHandlers();
     
     // Initialize database (wrapped in error handler)
-    await initDatabase().catch(error => {
+    await initDatabase().catch((error: Error) => {
       logger.error('Failed to initialize database', error);
       ErrorHandler.handleError(error);
     });
