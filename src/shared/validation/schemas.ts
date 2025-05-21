@@ -11,6 +11,11 @@ import { z } from 'zod';
 const colorHexPattern = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
 const urlPattern = /^(https?:\/\/)?([\w\-])+\.{1}([a-zA-Z]{2,63})([\/\w-]*)*\/?\??([^#\n\r]*)?#?([^\n\r]*)$/;
 
+// URL validation schema
+export const urlSchema = z.string().refine((val) => urlPattern.test(val), {
+    message: "Invalid URL format",
+});
+
 // Helper schemas that are reused across multiple models
 const metadataSchema = z.string().optional()
   .refine(
