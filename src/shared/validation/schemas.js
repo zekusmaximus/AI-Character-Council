@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.vectorDatabaseSchema = exports.userSettingsSchema = exports.taggedItemSchema = exports.tagSchema = exports.noteSchema = exports.characterEventLinkSchema = exports.timelineEventSchema = exports.timelineSchema = exports.conversationMessageSchema = exports.conversationSchema = exports.characterMemorySchema = exports.characterVersionSchema = exports.characterAttributeInputSchema = exports.personalityTraitInputSchema = exports.characterSchema = exports.projectSchema = void 0;
+exports.vectorDatabaseSchema = exports.userSettingsSchema = exports.taggedItemSchema = exports.tagSchema = exports.noteSchema = exports.characterEventLinkSchema = exports.timelineEventSchema = exports.timelineSchema = exports.conversationMessageSchema = exports.conversationSchema = exports.characterMemorySchema = exports.characterVersionSchema = exports.characterAttributeInputSchema = exports.personalityTraitInputSchema = exports.characterSchema = exports.projectSchema = exports.urlSchema = void 0;
 const zod_1 = require("zod");
 /**
  * Validation schemas for AI Character Council data models
@@ -11,6 +11,10 @@ const zod_1 = require("zod");
 // Helper regex patterns
 const colorHexPattern = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
 const urlPattern = /^(https?:\/\/)?([\w\-])+\.{1}([a-zA-Z]{2,63})([\/\w-]*)*\/?\??([^#\n\r]*)?#?([^\n\r]*)$/;
+// URL validation schema
+exports.urlSchema = zod_1.z.string().refine((val) => urlPattern.test(val), {
+    message: "Invalid URL format",
+});
 // Helper schemas that are reused across multiple models
 const metadataSchema = zod_1.z.string().optional()
     .refine((val) => !val || (() => { try {
