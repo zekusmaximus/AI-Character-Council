@@ -1,4 +1,4 @@
-import { Project, Prisma } from '@prisma/client';
+import { Project, Prisma, PrismaClient } from '@prisma/client';
 import { BaseRepository } from './BaseRepository';
 import { projectSchema, ProjectInput } from '../validation/schemas';
 import { createLogger } from '../utils/logger';
@@ -153,15 +153,20 @@ export class ProjectRepository extends BaseRepository<
       const project = await this.prisma.project.findUnique({
         where: { id },
         include: {
-          characters: true,
+          characters: {
+            include: {
+              personalityTraits: true,
+              characterAttributes: true,
+            },
+          },
           timelines: {
             include: {
-              events: true
-            }
+              events: true,
+            },
           },
           tags: true,
-          notes: true
-        }
+          notes: true,
+        },
       });
       
       if (!project) {
@@ -198,12 +203,12 @@ export class ProjectRepository extends BaseRepository<
 
           // Duplicate personality traits
           for (const trait of character.personalityTraits) {
-            await tx.personalityTraits.create({
+            await tx.personalityTrait.create({
               data: {
                 characterId: newCharacter.id,
-                name: trait, // Use trait directly if it's a string
-                value: '',   // Set a default value or adjust as needed
-              },
+                name: trait.name,
+                value: trait.value,
+              }
             });
           }
 
@@ -213,8 +218,8 @@ export class ProjectRepository extends BaseRepository<
               data: {
                 characterId: newCharacter.id,
                 name: attribute.name,
-                value: attribute.value,
-              },
+                value: attribute.value
+              }
             });
           }
 

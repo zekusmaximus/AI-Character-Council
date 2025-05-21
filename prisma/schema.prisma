@@ -13,11 +13,11 @@ datasource db {
 // Core entities
 
 model Project {
-  id          String      @id @default(uuid())
+  id          String   @id @default(uuid())
   name        String
   description String?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Relations
   characters    Character[]
@@ -28,165 +28,167 @@ model Project {
 }
 
 model Character {
-  id               String      @id @default(uuid())
-  projectId        String
-  name             String
-  bio              String?
-  image            String?     // Path or URL to character image
-  createdAt        DateTime    @default(now())
-  updatedAt        DateTime    @updatedAt
+  id        String   @id @default(uuid())
+  projectId String
+  name      String
+  bio       String?
+  image     String? // Path or URL to character image
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  project            Project               @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  characterVersions  CharacterVersion[]
-  memories           CharacterMemory[]     @relation("CharacterToMemories")
-  messages           ConversationMessage[]
+  project             Project               @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  characterVersions   CharacterVersion[]
+  memories            CharacterMemory[]     @relation("memoryToCharacter")
+  messages            ConversationMessage[]
   characterEventLinks CharacterEventLink[]
-  personalityTraits  PersonalityTrait[]
+  personalityTraits   PersonalityTrait[]
   characterAttributes CharacterAttribute[]
 }
 
 model PersonalityTrait {
   id          String   @id @default(uuid())
   characterId String
-  name        String   // e.g., "Openness", "Conscientiousness"
-  value       String   // Could be a numerical score, a description, etc.
+  name        String // e.g., "Openness", "Conscientiousness"
+  value       String // Could be a numerical score, a description, etc.
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
   @@unique([characterId, name]) // Assuming a character has a unique value for each trait name
+  @@map("personality_trait")
 }
 
 model CharacterAttribute {
   id          String   @id @default(uuid())
   characterId String
-  name        String   // The name of the custom attribute (e.g., "Strength", "Magic Affinity")
-  value       String   // The value of the custom attribute
+  name        String // The name of the custom attribute (e.g., "Strength", "Magic Affinity")
+  value       String // The value of the custom attribute
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
-  
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
   @@unique([characterId, name]) // Assuming a character has a unique value for each attribute name
+  @@map("character_attribute")
 }
 
 model CharacterVersion {
-  id          String      @id @default(uuid())
+  id          String   @id @default(uuid())
   characterId String
-  name        String      // Version name (e.g., "Young Arya", "Post-Transformation")
+  name        String // Version name (e.g., "Young Arya", "Post-Transformation")
   description String?
-  versionType String      // e.g., "age_stage", "transformation", "alternate_reality"
-  isActive    Boolean     @default(true)
-  metadata    String?     // JSON string with additional version-specific data
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  versionType String // e.g., "age_stage", "transformation", "alternate_reality"
+  isActive    Boolean  @default(true)
+  metadata    String? // JSON string with additional version-specific data
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Relations
-  character   Character   @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 }
 
 model CharacterMemory {
-  id           String      @id @default(uuid())
-  characterId  String
-  character    Character   @relation("memoryToCharacter", fields: [characterId], references: [id], onDelete: Cascade)
-  memoryType   String      // e.g., "episodic", "semantic", "procedural", "emotional"
-  content      String      // The actual memory content
-  source       String?     // Where this memory came from (conversation, author-defined, etc.)
-  importance   Int         @default(50) // 0-100 scale of memory importance
-  embedding    String?     // Vector embedding for the memory (serialized)
-  timestamp    DateTime    @default(now()) // When the memory was formed
-  expiresAt    DateTime?   // Optional expiration for temporary memories
-  metadata     String?     // JSON string with additional memory attributes
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  id          String    @id @default(uuid())
+  characterId String
+  character   Character @relation("memoryToCharacter", fields: [characterId], references: [id], onDelete: Cascade)
+  memoryType  String // e.g., "episodic", "semantic", "procedural", "emotional"
+  content     String // The actual memory content
+  source      String? // Where this memory came from (conversation, author-defined, etc.)
+  importance  Int       @default(50) // 0-100 scale of memory importance
+  embedding   String? // Vector embedding for the memory (serialized)
+  timestamp   DateTime  @default(now()) // When the memory was formed
+  expiresAt   DateTime? // Optional expiration for temporary memories
+  metadata    String? // JSON string with additional memory attributes
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Conversation {
-  id          String      @id @default(uuid())
-  projectId   String
-  title       String
-  description String?
-  isRoundtable Boolean    @default(false) // Whether this is a multi-character conversation
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id           String   @id @default(uuid())
+  projectId    String
+  title        String
+  description  String?
+  isRoundtable Boolean  @default(false) // Whether this is a multi-character conversation
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   // Relations
-  project     Project               @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  messages    ConversationMessage[]
+  project  Project               @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  messages ConversationMessage[]
 }
 
 model ConversationMessage {
-  id             String      @id @default(uuid())
+  id             String   @id @default(uuid())
   conversationId String
-  characterId    String?     // Null if message is from the author
+  characterId    String? // Null if message is from the author
   content        String
-  role           String      // "user", "assistant", "system"
-  timestamp      DateTime    @default(now())
-  metadata       String?     // JSON string with additional message data
-  isMemory       Boolean     @default(false) // Whether this message has been processed into memory
+  role           String // "user", "assistant", "system"
+  timestamp      DateTime @default(now())
+  metadata       String? // JSON string with additional message data
+  isMemory       Boolean  @default(false) // Whether this message has been processed into memory
 
   // Relations
-  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  character      Character?   @relation(fields: [characterId], references: [id], onDelete: SetNull)
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  character    Character?   @relation(fields: [characterId], references: [id], onDelete: SetNull)
 }
 
 model Timeline {
-  id          String      @id @default(uuid())
+  id          String   @id @default(uuid())
   projectId   String
   name        String
   description String?
-  color       String?     // Optional color for timeline visualization
-  isMainline  Boolean     @default(false) // Whether this is the primary timeline
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  color       String? // Optional color for timeline visualization
+  isMainline  Boolean  @default(false) // Whether this is the primary timeline
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Relations
-  project     Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  events      TimelineEvent[]
+  project Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  events  TimelineEvent[]
 }
 
 model TimelineEvent {
-  id          String      @id @default(uuid())
+  id          String   @id @default(uuid())
   timelineId  String
   title       String
   description String?
-  date        String?     // String to allow for fictional calendar systems
-  order       Int         // For sorting events within a timeline
-  importance  Int         @default(50) // 0-100 scale of event importance
-  metadata    String?     // JSON string with additional event data
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  date        String? // String to allow for fictional calendar systems
+  order       Int // For sorting events within a timeline
+  importance  Int      @default(50) // 0-100 scale of event importance
+  metadata    String? // JSON string with additional event data
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Relations
-  timeline           Timeline            @relation(fields: [timelineId], references: [id], onDelete: Cascade)
+  timeline            Timeline             @relation(fields: [timelineId], references: [id], onDelete: Cascade)
   characterEventLinks CharacterEventLink[]
 }
 
 model CharacterEventLink {
-  id          String      @id @default(uuid())
+  id          String   @id @default(uuid())
   characterId String
   eventId     String
-  role        String?     // Character's role in this event
-  impact      Int?        // 0-100 scale of how much this event impacts the character
-  notes       String?     // Additional notes about the character's involvement
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  role        String? // Character's role in this event
+  impact      Int? // 0-100 scale of how much this event impacts the character
+  notes       String? // Additional notes about the character's involvement
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Relations
-  character   Character     @relation(fields: [characterId], references: [id], onDelete: Cascade)
-  event       TimelineEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  character Character     @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  event     TimelineEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }
 
 model Note {
-  id          String      @id @default(uuid())
-  projectId   String
-  title       String
-  content     String
-  type        String?     // e.g., "character_note", "plot_point", "worldbuilding", "theme"
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id        String   @id @default(uuid())
+  projectId String
+  title     String
+  content   String
+  type      String? // e.g., "character_note", "plot_point", "worldbuilding", "theme"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
   project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
@@ -194,12 +196,12 @@ model Note {
 }
 
 model Tag {
-  id          String      @id @default(uuid())
-  projectId   String
-  name        String
-  color       String?     // Optional color for visual representation
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id        String   @id @default(uuid())
+  projectId String
+  name      String
+  color     String? // Optional color for visual representation
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
   project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
@@ -207,41 +209,41 @@ model Tag {
 }
 
 model TaggedItem {
-  id           String      @id @default(uuid())
-  tagId        String
-  itemType     String      // "character", "note", "timeline", "event", etc.
-  itemId       String      // ID of the tagged item
-  createdAt    DateTime    @default(now())
+  id        String   @id @default(uuid())
+  tagId     String
+  itemType  String // "character", "note", "timeline", "event", etc.
+  itemId    String // ID of the tagged item
+  createdAt DateTime @default(now())
 
   // Relations
-  tag          Tag         @relation("TagToTaggedItem", fields: [tagId], references: [id], onDelete: Cascade)
-  note         Note?       @relation("NoteToTaggedItem", fields: [noteId], references: [id], onDelete: Cascade)
-  noteId       String?     // Optional: only set if the item is a note
+  tag    Tag     @relation("TagToTaggedItem", fields: [tagId], references: [id], onDelete: Cascade)
+  note   Note?   @relation("NoteToTaggedItem", fields: [noteId], references: [id], onDelete: Cascade)
+  noteId String? // Optional: only set if the item is a note
 }
 
 // App settings
 
 model UserSettings {
-  id                String      @id @default(uuid())
-  theme             String      @default("light") // "light" or "dark"
-  llmProvider       String      @default("openai") // "openai", "anthropic", "local", etc.
-  llmModel          String      @default("gpt-4") // Model identifier
-  llmApiKey         String?     // Encrypted API key
-  maxMemoriesPerCall Int        @default(10) // Maximum memories to include in context
-  createdAt         DateTime    @default(now())
-  updatedAt         DateTime    @updatedAt
+  id                 String   @id @default(uuid())
+  theme              String   @default("light") // "light" or "dark"
+  llmProvider        String   @default("openai") // "openai", "anthropic", "local", etc.
+  llmModel           String   @default("gpt-4") // Model identifier
+  llmApiKey          String? // Encrypted API key
+  maxMemoriesPerCall Int      @default(10) // Maximum memories to include in context
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 }
 
 // Embedding model for vector search
 
 model VectorDatabase {
-  id          String      @id @default(uuid())
-  collection  String      // Name of the vector collection (e.g., "character_memories")
-  objectId    String      // ID of the original object (e.g., CharacterMemory ID)
-  vector      String      // Serialized vector data
-  metadata    String?     // JSON string with additional metadata for search
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id         String   @id @default(uuid())
+  collection String // Name of the vector collection (e.g., "character_memories")
+  objectId   String // ID of the original object (e.g., CharacterMemory ID)
+  vector     String // Serialized vector data
+  metadata   String? // JSON string with additional metadata for search
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@index([collection, objectId])
 }
