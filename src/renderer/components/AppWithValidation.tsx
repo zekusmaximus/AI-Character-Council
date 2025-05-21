@@ -25,12 +25,12 @@ const RootErrorFallback = ({ error, resetError }: { error: Error, resetError: ()
           d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" 
         />
       </svg>
-      
+
       <h1 className="text-2xl font-bold text-gray-800 mb-4">Application Error</h1>
       <p className="text-gray-600 mb-6">
         {error.message || 'An unexpected error occurred in the application.'}
       </p>
-      
+
       <div className="flex flex-col space-y-4">
         <button 
           onClick={resetError}
@@ -38,7 +38,7 @@ const RootErrorFallback = ({ error, resetError }: { error: Error, resetError: ()
         >
           Try Again
         </button>
-        
+
         <button 
           onClick={() => window.location.reload()}
           className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded"
@@ -70,9 +70,9 @@ function AppWithValidation() {
       setStatus(`Connection successful: ${response.data}`);      
     } catch (error) {
       setStatus(`Connection failed: ${error instanceof Error ? error.message : String(error)}`);
-      
+
       // Show the error dialog
-      setAppError(error);
+      setAppError(error instanceof Error ? error : new Error(String(error)));
       setIsErrorDialogOpen(true);
     }
   };
@@ -87,7 +87,7 @@ function AppWithValidation() {
       email: "Email must be valid",
       password: "Password must be at least 8 characters"
     };
-    
+
     setAppError(error);
     setIsErrorDialogOpen(true);
   };
@@ -128,7 +128,7 @@ function AppWithValidation() {
           </div>
         </div>
       </nav>
-      
+
       {/* Content */}
       <div className="py-6">
         {activeTab === 'home' && (
@@ -136,7 +136,7 @@ function AppWithValidation() {
             <div className="bg-white p-8 rounded-lg shadow-md max-w-md mx-auto">
               <h1 className="text-2xl font-bold text-gray-800 mb-4">AI Character Council</h1>
               <p className="text-gray-600 mb-6">Speculative Fiction Character Management</p>
-              
+
               <div className="space-y-4">
                 <button 
                   onClick={testConnection}
@@ -144,7 +144,7 @@ function AppWithValidation() {
                 >
                   Test Electron Connection
                 </button>
-                
+
                 <button 
                   onClick={triggerValidationError}
                   className="w-full bg-purple-500 hover:bg-purple-600 text-white font-medium py-2 px-4 rounded"
@@ -152,7 +152,7 @@ function AppWithValidation() {
                   Show Validation Error Dialog
                 </button>
               </div>
-              
+
               {status && (
                 <p className="mt-4 text-sm text-gray-700 p-2 bg-gray-100 rounded">
                   {status}
@@ -161,10 +161,10 @@ function AppWithValidation() {
             </div>
           </div>
         )}
-        
+
         {activeTab === 'validation' && <ValidationDemo />}
       </div>
-      
+
       {/* Error Dialog */}
       <EnhancedErrorDialog
         isOpen={isErrorDialogOpen}
