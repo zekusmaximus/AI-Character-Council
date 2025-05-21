@@ -41,8 +41,7 @@ export class UserSettingsRepository extends BaseRepository<
           theme: 'light',
           llmProvider: 'openai',
           llmModel: 'gpt-4',
-          maxMemoriesPerCall: 10,
-          autoSave: true
+          maxMemoriesPerCall: 10
         }
       });
     } catch (error) {

@@ -16,7 +16,7 @@ exports.urlSchema = zod_1.z.string().refine((val) => urlPattern.test(val), {
     message: "Invalid URL format",
 });
 // Helper schemas that are reused across multiple models
-const metadataSchema = zod_1.z.string().optional()
+exports.metadataSchema = zod_1.z.string().optional()
     .refine((val) => !val || (() => { try {
     JSON.parse(val);
     return true;
