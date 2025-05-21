@@ -74,6 +74,6 @@ export function useCharacter(characterId: string | null) {
     error,
     updateCharacter,
     updatePersonalityTraits,
-    updateCharacterSheet
+    updateCharacterAttributes
   };
 }
