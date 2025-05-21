@@ -26,8 +26,7 @@ export class CharacterService {
       // Parse JSON fields for all characters
       return data ? data.map(character => 
         parseJsonFields(character, {
-          personalityTraits: PersonalityTraitsField,
-          characterSheet: CharacterSheetField
+          personalityTraits: PersonalityTraitsField
         })
       ) : [];
     } catch (error) {
@@ -61,8 +60,7 @@ export class CharacterService {
       
       // Serialize JSON fields
       const serializedData = serializeJsonFields(validatedData, {
-        personalityTraits: PersonalityTraitsField,
-        characterSheet: CharacterSheetField
+        personalityTraits: PersonalityTraitsField
       } as any);
       
       // Create the character
@@ -70,8 +68,7 @@ export class CharacterService {
       
       // Parse JSON fields in the result
       return result ? parseJsonFields(result, {
-        personalityTraits: PersonalityTraitsField,
-        characterSheet: CharacterSheetField
+        personalityTraits: PersonalityTraitsField
       }) : null;
     } catch (error) {
       logger.error('Failed to create character', error);
@@ -88,8 +85,7 @@ export class CharacterService {
       
       // Serialize JSON fields
       const serializedData = serializeJsonFields(validatedData, {
-        personalityTraits: PersonalityTraitsField,
-        characterSheet: CharacterSheetField
+        personalityTraits: PersonalityTraitsField
       } as any);
       
       // Update the character
@@ -97,8 +93,7 @@ export class CharacterService {
       
       // Parse JSON fields in the result
       return result ? parseJsonFields(result, {
-        personalityTraits: PersonalityTraitsField,
-        characterSheet: CharacterSheetField
+        personalityTraits: PersonalityTraitsField
       }) : null;
     } catch (error) {
       logger.error(`Failed to update character ${id}`, error);
@@ -127,8 +122,7 @@ export class CharacterService {
       // Parse JSON fields for all characters
       return data ? data.map(character => 
         parseJsonFields(character, {
-          personalityTraits: PersonalityTraitsField,
-          characterSheet: CharacterSheetField
+          personalityTraits: PersonalityTraitsField
         })
       ) : [];
     } catch (error) {

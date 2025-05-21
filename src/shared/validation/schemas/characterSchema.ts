@@ -58,10 +58,7 @@ export const characterSchema = z.object({
       }).optional()
     }).optional()
   ]).optional().nullable(),
-  characterSheet: z.union([
-    z.string(),
-    z.record(z.any()).optional()
-  ]).optional().nullable(),
+  characterAttributes: z.array(z.object({ name: z.string(), value: z.string() })).optional(),
   image: z.string().max(1000, "Image path/URL is too long").optional().nullable(),
   createdAt: z.string().datetime().optional(),
   updatedAt: z.string().datetime().optional(),
