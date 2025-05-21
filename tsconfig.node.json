@@ -6,9 +6,8 @@
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "rootDir": "src",
     "outDir": "dist/main",
-    "baseUrl": "./src"
+    "rootDir": "src"
   },
-  "include": ["src/main/**/*.ts", "src/shared/**/*.ts", "electron-*.js", "vite.config.ts"]
+  "include": ["src/main/**/*.ts", "src/shared/**/*.ts"]
 }

@@ -19,13 +19,7 @@ export class CharacterRepositoryV2 extends BaseRepository<Character, CharacterCr
   async getByIdWithRelations(id: string): Promise<Character | null> {
     try {
       return await prisma.character.findUnique({
-        where: { id },
-        include: {
-          personalityTraits: true,
-          characterAttributes: true,
-          characterVersions: true,
-          characterMemories: true
-        }
+        where: { id }
       });
     } catch (error) {
       return handleDatabaseError(error, {

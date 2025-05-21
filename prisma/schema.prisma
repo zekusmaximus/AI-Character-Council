@@ -90,6 +90,7 @@ model CharacterVersion {
 model CharacterMemory {
   id           String      @id @default(uuid())
   characterId  String
+  character    Character   @relation("memoryToCharacter", fields: [characterId], references: [id], onDelete: Cascade)
   memoryType   String      // e.g., "episodic", "semantic", "procedural", "emotional"
   content      String      // The actual memory content
   source       String?     // Where this memory came from (conversation, author-defined, etc.)
@@ -100,9 +101,6 @@ model CharacterMemory {
   metadata     String?     // JSON string with additional memory attributes
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
-
-  // Relations
-  character    Character   @relation(fields: [characterId], references: [id], onDelete: Cascade)
 }
 
 model Conversation {

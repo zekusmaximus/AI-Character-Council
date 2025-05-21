@@ -32,7 +32,12 @@ export class ProjectRepository extends BaseRepository<
       const result = await this.prisma.project.findUnique({
         where: { id },
         include: {
-          characters: true,
+          characters: {
+            include: {
+              personalityTraits: true,
+              characterAttributes: true
+            } as any // Use 'as any' if TypeScript complains, but ideally update your Prisma schema to reflect these relations
+          },
           conversations: true,
           timelines: true,
           notes: true,
@@ -48,7 +53,13 @@ export class ProjectRepository extends BaseRepository<
         });
       }
       
-      return result;
+      return result as Project & {
+        characters: any[];
+        conversations: any[];
+        timelines: any[];
+        notes: any[];
+        tags: any[];
+      };
     } catch (error) {
       return handleDatabaseError(error, {
         operation: 'getByIdWithRelations',
@@ -181,24 +192,36 @@ export class ProjectRepository extends BaseRepository<
               projectId: newProject.id,
               name: character.name,
               bio: character.bio,
-              personalityTraits: {
-                createMany: {
-                  data: []
-                }
-              },
-              characterAttributes: {
-                createMany: {
-                  data: []
-                }
-              },
               image: character.image
             }
           });
-          
+
+          // Duplicate personality traits
+          for (const trait of character.personalityTraits) {
+            await tx.personalityTraits.create({
+              data: {
+                characterId: newCharacter.id,
+                name: trait, // Use trait directly if it's a string
+                value: '',   // Set a default value or adjust as needed
+              },
+            });
+          }
+
+          // Duplicate character attributes
+          for (const attribute of character.characterAttributes) {
+            await tx.characterAttribute.create({
+              data: {
+                characterId: newCharacter.id,
+                name: attribute.name,
+                value: attribute.value,
+              },
+            });
+          }
+
           // Store mapping of original ID to new ID
           characterIdMap.set(character.id, newCharacter.id);
         }
-        
+
         // Timeline ID mapping for events
         const timelineIdMap = new Map<string, string>();
         
