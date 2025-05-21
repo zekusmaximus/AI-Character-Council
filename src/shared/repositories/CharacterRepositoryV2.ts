@@ -19,7 +19,12 @@ export class CharacterRepositoryV2 extends BaseRepository<Character> {
         include: {
           personalityTraits: true,
           characterAttributes: true,
-          memories: true
+          memories: {
+            orderBy: [
+              { importance: 'desc' },
+              { timestamp: 'desc' }
+            ]
+          }
         }
       });
     } catch (error) {

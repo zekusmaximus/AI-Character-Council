@@ -39,7 +39,7 @@ model Character {
   // Relations
   project            Project               @relation(fields: [projectId], references: [id], onDelete: Cascade)
   characterVersions  CharacterVersion[]
-  characterMemories  CharacterMemory[]
+  memories           CharacterMemory[]     @relation("CharacterToMemories")
   messages           ConversationMessage[]
   characterEventLinks CharacterEventLink[]
   personalityTraits  PersonalityTrait[]
