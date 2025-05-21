@@ -48,8 +48,14 @@ export const characterSchema = z.object({
   // and will be handled by their own schemas and repository logic if direct input is needed.
   // For create/update operations, they will be part of the nested write.
   // If direct validation of these as input arrays is needed later, define schemas here.
-  personalityTraits: z.array(personalityTraitInputSchema).optional(),
-  characterAttributes: z.array(characterAttributeInputSchema).optional(),
+  personalityTraits: z.array(z.object({
+      name: z.string().min(1, "Trait name is required"),
+      value: z.string().min(1, "Trait value is required"),
+    })).optional(),
+    characterAttributes: z.array(z.object({
+      name: z.string().min(1, "Attribute name is required"),
+      value: z.string().min(1, "Attribute value is required"),
+    })).optional(),
 });
 
 // Schema for PersonalityTrait (as input, an array of these would be used)
