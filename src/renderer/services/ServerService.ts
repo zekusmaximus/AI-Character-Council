@@ -51,7 +51,7 @@ export class ServerService {
       });
     }
   }
-  
+
   static async getProjectById(id: string) {
     try {
       return await projectRepository.getByIdWithRelations(id);
@@ -63,17 +63,17 @@ export class ServerService {
       });
     }
   }
-  
+
   static async createProject(data: any) {
     try {
       // Validate project data
       const validatedData = validateProject(data, 'create');
-      
+
       // Create project
       return await projectRepository.create(validatedData);
     } catch (error) {
       if (typeof error === 'object' && error !== null && 'name' in error && (error as any).name === 'ValidationError') throw error;
-      
+
       return handleDatabaseError(error, {
         operation: 'createProject',
         table: 'project',
@@ -81,17 +81,17 @@ export class ServerService {
       });
     }
   }
-  
+
   static async updateProject(id: string, data: any) {
     try {
       // Validate project data
       const validatedData = validateProject({ ...data, id }, 'update');
-      
+
       // Update project
       return await projectRepository.update(id, data);
     } catch (error) {
       if (typeof error === 'object' && error !== null && 'name' in error && (error as any).name === 'ValidationError') throw error;
-      
+
       return handleDatabaseError(error, {
         operation: 'updateProject',
         table: 'project',
@@ -100,7 +100,7 @@ export class ServerService {
       });
     }
   }
-  
+
   static async deleteProject(id: string) {
     try {
       return await projectRepository.delete(id);
@@ -112,7 +112,7 @@ export class ServerService {
       });
     }
   }
-  
+
   static async getProjectsWithCounts() {
     try {
       return await projectRepository.getAllWithCounts();
@@ -123,7 +123,7 @@ export class ServerService {
       });
     }
   }
-  
+
   // Character services
   static async getCharactersByProject(projectId: string) {
     try {
@@ -136,16 +136,16 @@ export class ServerService {
       });
     }
   }
-  
+
   static async getCharacterById(id: string) {
     try {
       const character = await characterRepository.getByIdWithRelations(id);
-      
+
       // Parse JSON fields
       if (character) {
         return characterRepository.parseCharacter(character);
       }
-      
+
       return null;
     } catch (error) {
       return handleDatabaseError(error, {
@@ -155,26 +155,26 @@ export class ServerService {
       });
     }
   }
-  
+
   static async createCharacter(data: any) {
     try {
       // Validate character data
       const validatedData = validateCharacter(data, 'create');
-      
+
       // Handle JSON fields
       if (validatedData.personalityTraits && typeof validatedData.personalityTraits !== 'string') {
         validatedData.personalityTraits = PersonalityTraitsField.serialize(validatedData.personalityTraits);
       }
-      
+
       if (validatedData.characterSheet && typeof validatedData.characterSheet !== 'string') {
         validatedData.characterSheet = CharacterSheetField.serialize(validatedData.characterSheet);
       }
-      
+
       // Create character
       return await characterRepository.create(validatedData);
     } catch (error) {
       if (typeof error === 'object' && error !== null && 'name' in error && (error as any).name === 'ValidationError') throw error;
-      
+
       return handleDatabaseError(error, {
         operation: 'createCharacter',
         table: 'character',
@@ -182,26 +182,25 @@ export class ServerService {
       });
     }
   }
-  
+
   static async updateCharacter(id: string, data: any) {
     try {
       // Validate character data
       const validatedData = validateCharacter({ ...data, id }, 'update');
-      
+
       // Handle JSON fields
       if (validatedData.personalityTraits && typeof validatedData.personalityTraits !== 'string') {
         validatedData.personalityTraits = PersonalityTraitsField.serialize(validatedData.personalityTraits);
       }
-      
-      if (validatedData.characterSheet && typeof validatedData.characterSheet !== 'string') {
-        validatedData.characterSheet = CharacterSheetField.serialize(validatedData.characterSheet);
-      }
-      
+
+      // Character attributes are now handled as a relational field
+      // No serialization needed as they're stored in their own table
+
       // Update character
       return await characterRepository.update(id, validatedData);
     } catch (error) {
       if (typeof error === 'object' && error !== null && 'name' in error && (error as any).name === 'ValidationError') throw error;
-      
+
       return handleDatabaseError(error, {
         operation: 'updateCharacter',
         table: 'character',
@@ -210,7 +209,7 @@ export class ServerService {
       });
     }
   }
-  
+
   static async deleteCharacter(id: string) {
     try {
       return await characterRepository.delete(id);
@@ -222,12 +221,12 @@ export class ServerService {
       });
     }
   }
-  
+
   // Memory services
   static async getMemoriesByCharacter(characterId: string) {
     try {
       const memories = await memoryRepository.getByCharacter(characterId);
-      
+
       // Parse metadata for all memories
       return memories.map(memory => memoryRepository.parseMemory(memory));
     } catch (error) {
@@ -238,10 +237,10 @@ export class ServerService {
       });
     }
   }
-  
+
   // Additional services for other entities like Conversations, Timelines, Notes, Tags, etc.
   // would follow the same pattern as above
-  
+
   // Example for user settings
   static async getUserSettings() {
     try {
@@ -253,17 +252,17 @@ export class ServerService {
       });
     }
   }
-  
+
   static async updateUserSettings(data: any) {
     try {
       // Validate settings data
       const validatedData = validateUserSettings(data, 'update');
-      
+
       // Update settings
       return await settingsRepository.updateSettings(validatedData);
     } catch (error) {
       if (typeof error === 'object' && error !== null && 'name' in error && (error as any).name === 'ValidationError') throw error;
-      
+
       return handleDatabaseError(error, {
         operation: 'updateUserSettings',
         table: 'userSettings',
