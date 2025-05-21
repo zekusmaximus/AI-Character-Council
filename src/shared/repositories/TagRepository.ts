@@ -54,7 +54,7 @@ export class TagRepository extends BaseRepository<
         include: {
           _count: {
             select: {
-              taggedItems: true
+              TaggedItem: true
             }
           }
         }

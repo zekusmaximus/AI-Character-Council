@@ -91,7 +91,7 @@ export class NoteRepository extends BaseRepository<
       // This requires having TaggedItem entries linking Notes to the Character
       return await this.prisma.note.findMany({
         where: {
-          TaggedItem: {
+          taggedItems: {
             some: {
               itemType: 'character',
               itemId: characterId
