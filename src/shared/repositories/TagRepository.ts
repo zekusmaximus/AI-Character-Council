@@ -53,7 +53,7 @@ export class TagRepository extends BaseRepository<
   /**
    * Get tags with usage counts
    */
-  async getTagsWithCounts(projectId: string): Promise<(Tag & { _count: { TaggedItem: number } })[]> {
+  async getTagsWithCounts(projectId: string): Promise<(Tag & { _count: { taggedItems: number } })[]> {
     try {
       return await this.prisma.tag.findMany({
         where: { projectId },

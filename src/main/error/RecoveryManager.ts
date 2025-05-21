@@ -1,7 +1,7 @@
 // src/main/error/RecoveryManager.ts
 import { DatabaseError, ApiError } from '../../shared/utils/errors/AppError';
 import { createLogger } from '../../shared/utils/logger';
-import { prisma } from '../services/database';
+import { prisma } from '../database/database';
 
 const logger = createLogger('RecoveryManager');
 

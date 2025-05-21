@@ -181,8 +181,16 @@ export class ProjectRepository extends BaseRepository<
               projectId: newProject.id,
               name: character.name,
               bio: character.bio,
-              personalityTraits: character.personalityTraits,
-              characterSheet: character.characterSheet,
+              personalityTraits: {
+                createMany: {
+                  data: []
+                }
+              },
+              characterAttributes: {
+                createMany: {
+                  data: []
+                }
+              },
               image: character.image
             }
           });

@@ -1,33 +1,24 @@
 import { z } from 'zod';
 
-/**
- * Validation schemas for AI Character Council data models
- * 
- * These schemas validate data before it reaches the database layer.
- * They ensure data integrity and provide clear error messages.
- */
-
 // Helper regex patterns
 const colorHexPattern = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
 const urlPattern = /^(https?:\/\/)?([\w\-])+\.{1}([a-zA-Z]{2,63})([\/\w-]*)*\/?\??([^#\n\r]*)?#?([^\n\r]*)$/;
 
-// URL validation schema
-export const urlSchema = z.string().refine((val) => urlPattern.test(val), {
-    message: "Invalid URL format",
-});
-
 // Helper schemas that are reused across multiple models
-const metadataSchema = z.string().optional()
-  .refine(
-    (val) => !val || (() => { try { JSON.parse(val); return true; } catch { return false; } })(),
-    { message: "Metadata must be valid JSON or empty" }
-  );
+export const metadataSchema = z.string().optional()
+    .refine((val) => !val || (() => { try {
+    JSON.parse(val);
+    return true;
+}
+catch {
+    return false;
+} })(), { message: "Metadata must be valid JSON or empty" });
 
-const dateOrStringSchema = z.union([
-  z.date(),
-  z.string().refine(val => !isNaN(Date.parse(val)), {
-    message: "Invalid date string format"
-  })
+export const dateOrStringSchema = z.union([
+    z.date(),
+    z.string().refine(val => !isNaN(Date.parse(val)), {
+        message: "Invalid date string format"
+    })
 ]);
 
 // Project schema

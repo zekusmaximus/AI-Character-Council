@@ -123,7 +123,13 @@ export class CharacterRepositoryV2 extends BaseRepository<
 
       if (personalityTraits && personalityTraits.length > 0) {
         createData.personalityTraits = {
-          create: personalityTraits.map((pt: PersonalityTraitInput) => ({ name: pt.name, value: pt.value }))
+          createMany: {
+            data: personalityTraits.map((pt: PersonalityTraitInput) => ({ 
+              name: pt.name, 
+              value: pt.value 
+            })),
+            skipDuplicates: false
+          }
         };
       }
 
