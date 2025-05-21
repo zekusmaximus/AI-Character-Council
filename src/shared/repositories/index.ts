@@ -1,13 +1,26 @@
-// src/shared/repositories/index.ts
-import { prisma } from '../../main/database/database'; // Use a single prisma import
 
-// Export repositories
-export { BaseRepository } from './BaseRepository';
-export { CharacterRepositoryV2 as CharacterRepository } from './CharacterRepositoryV2';
-export { MemoryRepository } from './MemoryRepository';
-export { ConversationRepository, ConversationMessageRepository } from './ConversationRepository';
-export { TimelineRepository, TimelineEventRepository } from './TimelineRepository';
-export { ProjectRepository } from './ProjectRepository';
+// src/shared/repositories/index.ts
+import { prisma } from '../../main/database/database';
+
+// Import repositories
+import { BaseRepository } from './BaseRepository';
+import { CharacterRepositoryV2 } from './CharacterRepositoryV2';
+import { MemoryRepository } from './MemoryRepository';
+import { ConversationRepository, ConversationMessageRepository } from './ConversationRepository';
+import { TimelineRepository, TimelineEventRepository } from './TimelineRepository';
+import { ProjectRepository } from './ProjectRepository';
+
+// Export repository classes
+export {
+  BaseRepository,
+  CharacterRepositoryV2 as CharacterRepository,
+  MemoryRepository,
+  ConversationRepository,
+  ConversationMessageRepository,
+  TimelineRepository,
+  TimelineEventRepository,
+  ProjectRepository
+};
 
 // Create singleton instances
 const characterRepository = new CharacterRepositoryV2();
