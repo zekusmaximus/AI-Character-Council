@@ -74,7 +74,7 @@ export function removeIpcHandler(channel: string): void {
 export function initCoreIpcHandlers(): void {
   // Ping handler to check IPC connectivity
   registerIpcHandler('ping', () => {
-    return 'pong';
+    return { message: 'pong' };
   });
   
   // Handler to get application logs
