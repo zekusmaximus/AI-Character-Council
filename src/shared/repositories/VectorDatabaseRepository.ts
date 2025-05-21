@@ -1,10 +1,10 @@
 // src/shared/repositories/VectorDatabaseRepository.ts
 
 import { VectorDatabase } from '@prisma/client';
-import { BaseRepository } from './BaseRepository';
-import { vectorDatabaseSchema, VectorDatabaseInput } from '../validation/schemas';
-import { createLogger } from '../utils/logger';
-import { handleDatabaseError } from '../../main/database/databaseErrorHandler';
+import { BaseRepository } from './BaseRepository.js';
+import { vectorDatabaseSchema, VectorDatabaseInput } from '../validation/schemas.js';
+import { createLogger } from '../utils/logger.js';
+import { handleDatabaseError } from '../../main/database/databaseErrorHandler.js';
 
 const logger = createLogger('VectorDatabaseRepository');
 

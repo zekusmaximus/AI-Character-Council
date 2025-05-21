@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { ValidationError } from '../utils/errors/AppError';
-import { createLogger } from '../utils/logger';
-import * as schemas from './schemas';
+import { ValidationError } from '../utils/errors/AppError.js';
+import { createLogger } from '../utils/logger.js';
+import * as schemas from './schemas.js';
 
 const logger = createLogger('ValidationUtils');
 

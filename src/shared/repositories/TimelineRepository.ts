@@ -1,8 +1,8 @@
 import { Timeline, TimelineEvent, Prisma } from '@prisma/client';
-import { BaseRepository } from './BaseRepository';
-import { timelineSchema, timelineEventSchema, TimelineInput, TimelineEventInput } from '../validation/schemas';
-import { createLogger } from '../utils/logger';
-import { handleDatabaseError } from '../../main/database/databaseErrorHandler';
+import { BaseRepository } from './BaseRepository.js';
+import { timelineSchema, timelineEventSchema, TimelineInput, TimelineEventInput } from '../validation/schemas.js';
+import { createLogger } from '../utils/logger.js';
+import { handleDatabaseError } from '../../main/database/databaseErrorHandler.js';
 
 const logger = createLogger('TimelineRepository');
 

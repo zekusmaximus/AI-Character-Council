@@ -212,7 +212,7 @@ export class Logger {
       const node_fs = require('fs');
       // Check if file needs rotation
       if (this.currentLogSize + entry.length > this.config.maxFileSize) {
-        this.rotateLogFiles(); // rotateLogFiles will use its own require for fs and path
+        this.rotateLogFiles(); // rotateLogFiles will use its own require for fs
       }
       
       // Append to log file

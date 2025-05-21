@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { ValidationError } from '../utils/errors/AppError';
-import * as schemas from './schemas';
+import { ValidationError } from '../utils/errors/AppError.js';
+import * as schemas from './schemas.js';
 
 /**
  * Validation service for data models

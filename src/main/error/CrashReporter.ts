@@ -2,7 +2,7 @@
 import { app } from 'electron';
 import * as fs from 'fs';
 import * as path from 'path';
-import { createLogger } from '../../shared/utils/logger';
+import { createLogger } from '../../shared/utils/logger.js';
 
 const logger = createLogger('CrashReporter');
 

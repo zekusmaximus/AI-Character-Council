@@ -1,7 +1,6 @@
-
-import { prisma } from '../database/database';
-import { createLogger } from '../../shared/utils/logger';
-import { handleDatabaseError } from '../database/databaseErrorHandler';
+import { prisma } from '../database/database.js';
+import { createLogger } from '../../shared/utils/logger.js';
+import { handleDatabaseError } from '../database/databaseErrorHandler.js';
 
 const logger = createLogger('DatabaseInit');
 

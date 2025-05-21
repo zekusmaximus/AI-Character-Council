@@ -4,8 +4,8 @@ import {
   PrismaClientInitializationError,
   PrismaClientRustPanicError
 } from '@prisma/client/runtime/library';
-import { DatabaseError, NotFoundError, ValidationError } from '../../shared/utils/errors/AppError';
-import { createLogger } from '../../shared/utils/logger';
+import { DatabaseError, NotFoundError, ValidationError } from '../../shared/utils/errors/AppError.js';
+import { createLogger } from '../../shared/utils/logger.js';
 
 const logger = createLogger('DatabaseErrorHandler');
 

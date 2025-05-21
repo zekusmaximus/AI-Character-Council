@@ -1,10 +1,10 @@
 // src/shared/repositories/NoteRepository.ts
 
 import { Note, Prisma } from '@prisma/client';
-import { BaseRepository } from './BaseRepository';
-import { noteSchema, NoteInput } from '../validation/schemas';
-import { createLogger } from '../utils/logger';
-import { handleDatabaseError } from '../../main/database/databaseErrorHandler';
+import { BaseRepository } from './BaseRepository.js';
+import { noteSchema, NoteInput } from '../validation/schemas.js';
+import { createLogger } from '../utils/logger.js';
+import { handleDatabaseError } from '../../main/database/databaseErrorHandler.js';
 
 const logger = createLogger('NoteRepository');
 

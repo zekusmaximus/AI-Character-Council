@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
-import { prisma } from '../../main/database/database';
-import { handleDatabaseError } from '../../main/database/databaseErrorHandler';
-import { createLogger } from '../utils/logger';
+import { prisma } from '../../main/database/database.js';
+import { handleDatabaseError } from '../../main/database/databaseErrorHandler.js';
+import { createLogger } from '../utils/logger.js';
 import { z } from 'zod';
 
 const logger = createLogger('BaseRepository');

@@ -1,15 +1,15 @@
 // src/shared/repositories/TagRepository.ts
 
 import { Tag, TaggedItem, Prisma } from '@prisma/client';
-import { BaseRepository } from './BaseRepository';
+import { BaseRepository } from './BaseRepository.js';
 import { 
   tagSchema, 
   taggedItemSchema, 
   TagInput, 
   TaggedItemInput 
-} from '../validation/schemas';
-import { createLogger } from '../utils/logger';
-import { handleDatabaseError } from '../../main/database/databaseErrorHandler';
+} from '../validation/schemas.js';
+import { createLogger } from '../utils/logger.js';
+import { handleDatabaseError } from '../../main/database/databaseErrorHandler.js';
 
 const logger = createLogger('TagRepository');
 

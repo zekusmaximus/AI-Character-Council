@@ -1,10 +1,9 @@
-
 import { Character, Prisma } from '@prisma/client';
-import { BaseRepository } from './BaseRepository';
-import { prisma } from '../../main/database/database';
-import { createLogger } from '../utils/logger';
-import { handleDatabaseError } from '../../main/database/databaseErrorHandler';
-import { characterSchema } from '../validation/schemas';
+import { BaseRepository } from './BaseRepository.js';
+import { prisma } from '../../main/database/database.js';
+import { createLogger } from '../utils/logger.js';
+import { handleDatabaseError } from '../../main/database/databaseErrorHandler.js';
+import { characterSchema } from '../validation/schemas.js';
 
 const logger = createLogger('CharacterRepositoryV2');
 

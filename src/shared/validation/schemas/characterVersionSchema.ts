@@ -1,6 +1,5 @@
-
 import { z } from 'zod';
-import { metadataSchema } from '../schemas';
+import { metadataSchema } from '../schemas.js';
 
 export const characterVersionSchema = z.object({
   id: z.string().uuid().optional(),

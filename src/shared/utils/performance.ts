@@ -1,5 +1,5 @@
 // src/shared/utils/performance.ts
-import { createLogger } from './logger';
+import { createLogger } from './logger.js';
 
 const logger = createLogger('Performance');
 const performanceThresholds = {

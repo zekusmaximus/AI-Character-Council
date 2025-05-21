@@ -1,6 +1,6 @@
 // src/shared/utils/jsonUtils.ts
 
-import { createLogger } from './logger';
+import { createLogger } from './logger.js';
 
 const logger = createLogger('JsonUtils');
 

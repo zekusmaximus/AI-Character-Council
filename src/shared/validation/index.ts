@@ -1,6 +1,6 @@
 // Export all validation-related modules from a central location
-import * as schemas from './schemas';
-import { ValidationService } from './ValidationService';
+import * as schemas from './schemas.js';
+import { ValidationService } from './ValidationService.js';
 import { ValidationUtils, 
   validateProject,
   validateCharacter,
@@ -12,10 +12,10 @@ import { ValidationUtils,
   validateNote,
   validateTag,
   validateUserSettings
-} from './utils';
+} from './utils.js';
 
 // Export all schemas and types
-export * from './schemas';
+export * from './schemas.js';
 
 // Export validation service and utils
 export {

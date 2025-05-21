@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron';
-import { createLogger } from '../../shared/utils/logger';
-import { AppError } from '../../shared/utils/errors/AppError';
-import { ErrorHandler } from '../error/ErrorHandler';
+import { createLogger } from '../../shared/utils/logger.js';
+import { AppError } from '../../shared/utils/errors/AppError.js';
+import { ErrorHandler } from '../error/ErrorHandler.js';
 
 const logger = createLogger('IpcHandler');
 

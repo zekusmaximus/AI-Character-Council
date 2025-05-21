@@ -1,8 +1,8 @@
 import { app } from 'electron';
 import * as fs from 'fs';
 import * as path from 'path';
-import { createLogger } from '../../shared/utils/logger';
-import { AppError } from '../../shared/utils/errors/AppError';
+import { createLogger } from '../../shared/utils/logger.js';
+import { AppError } from '../../shared/utils/errors/AppError.js';
 
 const logger = createLogger('ErrorMonitoring');
 

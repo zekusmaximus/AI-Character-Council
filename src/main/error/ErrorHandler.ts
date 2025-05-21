@@ -1,6 +1,6 @@
 import { app, dialog } from 'electron';
-import { createLogger, Logger } from '../../shared/utils/logger';
-import { AppError } from '../../shared/utils/errors/AppError';
+import { createLogger, Logger } from '../../shared/utils/logger.js';
+import { AppError } from '../../shared/utils/errors/AppError.js';
 
 // Create logger for this module
 const logger = createLogger('ErrorHandler');

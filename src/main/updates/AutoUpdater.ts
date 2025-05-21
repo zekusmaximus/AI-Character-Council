@@ -1,7 +1,7 @@
 // src/main/updates/AutoUpdater.ts
+import { app, dialog, BrowserWindow } from 'electron';
 import { autoUpdater } from 'electron-updater';
-import { BrowserWindow, dialog } from 'electron';
-import { createLogger } from '../../shared/utils/logger';
+import { createLogger } from '../../shared/utils/logger.js';
 import * as isDev from 'electron-is-dev';
 
 const logger = createLogger('AutoUpdater');
@@ -18,7 +18,7 @@ export class AutoUpdater {
     this.mainWindow = mainWindow;
 
     // Configure updater
-    autoUpdater.logger = logger;
+    (autoUpdater as any).logger = logger;
     autoUpdater.autoDownload = true;
     autoUpdater.autoInstallOnAppQuit = true;
 
@@ -98,7 +98,7 @@ export class AutoUpdater {
         cancelId: 1
       }).then(({ response }: { response: number }) => {
         if (response === 0) {
-          autoUpdater.quitAndInstall(false, true);
+          autoUpdater.quitAndInstall();
         }
       });
     });

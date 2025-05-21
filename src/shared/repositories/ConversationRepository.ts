@@ -1,13 +1,13 @@
 import { Conversation, ConversationMessage, Prisma } from '@prisma/client';
-import { BaseRepository } from './BaseRepository';
+import { BaseRepository } from './BaseRepository.js';
 import { 
   conversationSchema, 
   conversationMessageSchema, 
   ConversationInput, 
   ConversationMessageInput 
-} from '../validation/schemas';
-import { createLogger } from '../utils/logger';
-import { handleDatabaseError } from '../../main/database/databaseErrorHandler';
+} from '../validation/schemas.js';
+import { createLogger } from '../utils/logger.js';
+import { handleDatabaseError } from '../../main/database/databaseErrorHandler.js';
 
 const logger = createLogger('ConversationRepository');
 

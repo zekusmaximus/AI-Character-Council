@@ -3,11 +3,11 @@ import * as path from 'path';
 import * as isDev from 'electron-is-dev';
 
 // Import error handling and logging
-import { initDatabase } from './services/initDatabase';
-import { Logger, LogLevel } from '../shared/utils/logger';
-import { ErrorHandler } from './error/ErrorHandler';
-import { ErrorMonitoring } from './error/ErrorMonitoring';
-import { initCoreIpcHandlers } from './ipc/ipcHandler';
+import { initDatabase } from './services/initDatabase.js';
+import { Logger, LogLevel } from '../shared/utils/logger.js';
+import { ErrorHandler } from './error/ErrorHandler.js';
+import { ErrorMonitoring } from './error/ErrorMonitoring.js';
+import { initCoreIpcHandlers } from './ipc/ipcHandler.js';
 
 // Configure global logger
 const logLevel = isDev ? LogLevel.DEBUG : LogLevel.INFO;

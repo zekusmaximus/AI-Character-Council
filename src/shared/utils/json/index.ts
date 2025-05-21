@@ -1,7 +1,7 @@
 // src/shared/utils/json/index.ts
 
 // Export all JSON utilities from this central location
-export * from '../jsonUtils';
+export * from '../jsonUtils.js';
 
 // Usage examples:
 
@@ -44,7 +44,7 @@ await CharacterService.update(character.id, {
 
 Example with parseJsonFields and serializeJsonFields utility functions:
 
-import { parseJsonFields, serializeJsonFields } from '@/shared/utils/json';
+import { parseJsonFields, serializeJsonFields } from '@/shared/utils/json.js';
 
 // Parse multiple JSON fields at once
 const parsedCharacter = parseJsonFields(character, {

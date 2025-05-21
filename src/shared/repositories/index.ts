@@ -1,14 +1,13 @@
-
 // src/shared/repositories/index.ts
-import { prisma } from '../../main/database/database';
+import { prisma } from '../../main/database/database.js';
 
 // Import repositories
-import { BaseRepository } from './BaseRepository';
-import { CharacterRepositoryV2 } from './CharacterRepositoryV2';
-import { MemoryRepository } from './MemoryRepository';
-import { ConversationRepository, ConversationMessageRepository } from './ConversationRepository';
-import { TimelineRepository, TimelineEventRepository } from './TimelineRepository';
-import { ProjectRepository } from './ProjectRepository';
+import { BaseRepository } from './BaseRepository.js';
+import { CharacterRepositoryV2 } from './CharacterRepositoryV2.js';
+import { MemoryRepository } from './MemoryRepository.js';
+import { ConversationRepository, ConversationMessageRepository } from './ConversationRepository.js';
+import { TimelineRepository, TimelineEventRepository } from './TimelineRepository.js';
+import { ProjectRepository } from './ProjectRepository.js';
 
 // Export repository classes
 export {
