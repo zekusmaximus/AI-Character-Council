@@ -1,44 +1,3 @@
-import { Character, Prisma } from '@prisma/client';
-import { BaseRepository } from './BaseRepository';
-import { characterSchema, CharacterInput } from '../validation/schemas';
-import { createLogger } from '../utils/logger';
-import { handleDatabaseError } from '../../main/database/databaseErrorHandler';
-
-const logger = createLogger('CharacterRepositoryV2');
-
-/**
- * Repository for Character-related database operations using BaseRepository
- */
-export class CharacterRepositoryV2 extends BaseRepository<
-  Character,
-  CharacterInput,
-  Partial<CharacterInput>
-> {
-  constructor() {
-    super('character', characterSchema);
-  }
-  
-  /**
-   * Get all characters for a project
-   */
-  async getAllByProject(projectId: string): Promise<Character[]> {
-    try {
-      return await this.prisma.character.findMany({
-        where: { projectId },
-        orderBy: { name: 'asc' }
-      });
-    } catch (error) {
-      return handleDatabaseError(error, {
-        operation: 'getAllByProject',
-        table: this.tableName,
-        data: { projectId }
-      });
-    }
-  }
-  
-  /**
-   * Get a character with related data
-   */
 import { Character, Prisma, PersonalityTrait, CharacterAttribute } from '@prisma/client';
 import { BaseRepository } from './BaseRepository';
 import { characterSchema, CharacterInput, PersonalityTraitInput, CharacterAttributeInput } from '../validation/schemas';
@@ -58,7 +17,7 @@ export class CharacterRepositoryV2 extends BaseRepository<
   constructor() {
     super('character', characterSchema);
   }
-  
+
   /**
    * Get all characters for a project
    */
@@ -76,7 +35,7 @@ export class CharacterRepositoryV2 extends BaseRepository<
       });
     }
   }
-  
+
   /**
    * Get a character with related data
    */
@@ -106,7 +65,7 @@ export class CharacterRepositoryV2 extends BaseRepository<
         logger.warn(`Character with id ${id} not found for getByIdWithRelations.`);
         return null;
       }
-      return result as (Character & { // Type assertion to satisfy the detailed return type
+      return result as (Character & {
         characterMemories: Prisma.CharacterMemoryGetPayload<{}>[];
         characterVersions: Prisma.CharacterVersionGetPayload<{}>[];
         characterEventLinks: Prisma.CharacterEventLinkGetPayload<{ include: { event: true } }>[];
@@ -121,7 +80,7 @@ export class CharacterRepositoryV2 extends BaseRepository<
       });
     }
   }
-  
+
   /**
    * Search characters by name
    */
@@ -132,11 +91,11 @@ export class CharacterRepositoryV2 extends BaseRepository<
           contains: name
         }
       };
-      
+
       if (projectId) {
         where.projectId = projectId;
       }
-      
+
       return await this.prisma.character.findMany({
         where,
         orderBy: { name: 'asc' }
@@ -149,7 +108,7 @@ export class CharacterRepositoryV2 extends BaseRepository<
       });
     }
   }
-  
+
   /**
    * Handle special case for character creation with personality traits
    */
@@ -159,33 +118,33 @@ export class CharacterRepositoryV2 extends BaseRepository<
       const { personalityTraits, characterAttributes, ...characterCoreData } = validatedData;
 
       const createData: Prisma.CharacterCreateInput = {
-        ...characterCoreData,
+        ...characterCoreData
       };
 
       if (personalityTraits && personalityTraits.length > 0) {
         createData.personalityTraits = {
-          create: personalityTraits.map((pt: PersonalityTraitInput) => ({ name: pt.name, value: pt.value })),
+          create: personalityTraits.map((pt: PersonalityTraitInput) => ({ name: pt.name, value: pt.value }))
         };
       }
 
       if (characterAttributes && characterAttributes.length > 0) {
         createData.characterAttributes = {
-          create: characterAttributes.map((ca: CharacterAttributeInput) => ({ name: ca.name, value: ca.value })),
+          create: characterAttributes.map((ca: CharacterAttributeInput) => ({ name: ca.name, value: ca.value }))
         };
       }
-      
+
       return await this.prisma.character.create({
         data: createData,
         include: {
           personalityTraits: true,
-          characterAttributes: true,
-        },
+          characterAttributes: true
+        }
       });
     } catch (error: any) {
       if (error.name === 'ValidationError') {
-        throw error; // Re-throw validation errors
+        throw error;
       }
-      
+
       return handleDatabaseError(error, {
         operation: 'create',
         table: this.tableName,
@@ -193,82 +152,74 @@ export class CharacterRepositoryV2 extends BaseRepository<
       });
     }
   }
-  
+
   /**
    * Handle special case for character update with personality traits
    */
-  async update(id: string, data: Partial<CharacterInput>): Promise<Character> {
-    try {
   async update(id: string, data: Partial<CharacterInput>): Promise<Character & { personalityTraits: PersonalityTrait[], characterAttributes: CharacterAttribute[] }> {
     try {
-      // Ensure 'id' is part of the data for validation, even if not directly used in `dataToUpdate`
       const validatedData = this.validate({ ...data, id }, 'update');
       const { id: validatedId, personalityTraits, characterAttributes, ...characterCoreData } = validatedData;
 
-      // Transaction to ensure atomicity
       return await this.prisma.$transaction(async (tx) => {
         // 1. Update core character data
-        // We only update if there's actual core data to update.
         const coreDataKeys = Object.keys(characterCoreData);
         let charUpdatePromise;
         if (coreDataKeys.length > 0 && Object.values(characterCoreData).some(v => v !== undefined)) {
-             charUpdatePromise = tx.character.update({
-                where: { id },
-                data: characterCoreData,
-            });
+          charUpdatePromise = tx.character.update({
+            where: { id },
+            data: characterCoreData
+          });
         } else {
-            // If no core data, fetch the character to ensure it exists before relation updates
-            charUpdatePromise = tx.character.findUniqueOrThrow({ where: { id }});
+          charUpdatePromise = tx.character.findUniqueOrThrow({ where: { id } });
         }
-        
+
         const updatedCoreCharacter = await charUpdatePromise;
 
-        // 2. Handle personalityTraits: Delete existing and create new ones if provided
-        if (personalityTraits !== undefined) { // Check if the field was provided, even if empty array
+        // 2. Handle personalityTraits
+        if (personalityTraits !== undefined) {
           await tx.personalityTrait.deleteMany({ where: { characterId: id } });
           if (personalityTraits.length > 0) {
             await tx.personalityTrait.createMany({
               data: personalityTraits.map((pt: PersonalityTraitInput) => ({
                 characterId: id,
                 name: pt.name,
-                value: pt.value,
+                value: pt.value
               })),
-              skipDuplicates: true, // Good for resilience, though with prior delete, less critical
+              skipDuplicates: true
             });
           }
         }
 
-        // 3. Handle characterAttributes: Delete existing and create new ones if provided
-        if (characterAttributes !== undefined) { // Check if the field was provided
+        // 3. Handle characterAttributes
+        if (characterAttributes !== undefined) {
           await tx.characterAttribute.deleteMany({ where: { characterId: id } });
           if (characterAttributes.length > 0) {
             await tx.characterAttribute.createMany({
               data: characterAttributes.map((ca: CharacterAttributeInput) => ({
                 characterId: id,
                 name: ca.name,
-                value: ca.value,
+                value: ca.value
               })),
-              skipDuplicates: true,
+              skipDuplicates: true
             });
           }
         }
-        
-        // 4. Fetch the final character with updated relations
-        // Use findUniqueOrThrow to ensure character exists, as it should.
+
+        // 4. Return final character with relations
         return tx.character.findUniqueOrThrow({
           where: { id },
           include: {
             personalityTraits: true,
-            characterAttributes: true,
-          },
+            characterAttributes: true
+          }
         });
       });
-
     } catch (error: any) {
       if (error.name === 'ValidationError') {
-        throw error; // Re-throw validation errors
+        throw error;
       }
-      
+
       return handleDatabaseError(error, {
         operation: 'update',
         table: this.tableName,
@@ -277,5 +228,4 @@ export class CharacterRepositoryV2 extends BaseRepository<
       });
     }
   }
-  
 }
