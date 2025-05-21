@@ -28,11 +28,18 @@ export class TagRepository extends BaseRepository<
   /**
    * Get all tags for a project
    */
-  async getByProject(projectId: string): Promise<Tag[]> {
+  async getByProject(projectId: string): Promise<(Tag & { _count: { taggedItems: number } })[]> {
     try {
       return await this.prisma.tag.findMany({
         where: { projectId },
-        orderBy: { name: 'asc' }
+        orderBy: { name: 'asc' },
+        include: {
+          _count: {
+            select: {
+              taggedItems: true
+            }
+          }
+        }
       });
     } catch (error) {
       return handleDatabaseError(error, {
@@ -54,7 +61,7 @@ export class TagRepository extends BaseRepository<
         include: {
           _count: {
             select: {
-              TaggedItem: true
+              taggedItems: true
             }
           }
         }
