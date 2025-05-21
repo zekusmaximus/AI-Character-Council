@@ -14,10 +14,19 @@ deploymentTarget = "autoscale"
 ignorePorts = false
 
 [workflows]
-runButton = "Run Application"
+runButton = "Run"
 
 [[workflows.workflow]]
 name = "Run Application"
+author = 42945471
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run build && node build/main/main.js"
+
+[[workflows.workflow]]
+name = "Run"
 author = 42945471
 mode = "sequential"
 
