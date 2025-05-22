@@ -1,3 +1,4 @@
+
 import pkg from 'electron';
 const { app, BrowserWindow } = pkg;
 import * as path from 'path';
@@ -27,7 +28,7 @@ Logger.getInstance({
 const logger = Logger.getInstance();
 
 // Global reference to mainWindow to prevent garbage collection
-let mainWindow: typeof BrowserWindow | null = null;
+let mainWindow: BrowserWindow | null = null;
 
 /**
  * Initialize the application
@@ -84,6 +85,10 @@ async function createWindow() {
     show: false, // Don't show until ready-to-show
   });
 
+  if (!mainWindow) {
+    throw new Error('Failed to create browser window');
+  }
+
   // Handle window creation errors
   mainWindow.webContents.on('did-fail-load', (errorCode: number, errorDescription: string) => {
     logger.error('Window failed to load', { errorCode, errorDescription });
@@ -107,13 +112,15 @@ async function createWindow() {
     : `file://${path.join(__dirname, '../index.html')}`;
   
   try {
-    await mainWindow.loadURL(startURL);
-    logger.info(`Loaded URL: ${startURL}`);
-    
-    // Open DevTools if in development
-    if (isDev) {
-      mainWindow.webContents.openDevTools();
-      logger.debug('Opened DevTools in development mode');
+    if (mainWindow) {
+      await mainWindow.loadURL(startURL);
+      logger.info(`Loaded URL: ${startURL}`);
+      
+      // Open DevTools if in development
+      if (isDev) {
+        mainWindow.webContents.openDevTools();
+        logger.debug('Opened DevTools in development mode');
+      }
     }
   } catch (error) {
     logger.error('Failed to load application URL', error);
