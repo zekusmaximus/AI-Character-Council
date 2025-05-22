@@ -2,7 +2,7 @@
   "name": "ai-character-council",
   "version": "1.0.0",
   "description": "AI-powered character management for speculative fiction authors",
-  "main": "build/main/main/main.js",
+  "main": "build/main/main.js",
   "author": "Your Name",
   "license": "MIT",
   "private": true,
