@@ -1,6 +1,6 @@
 // src/main/error/CrashReporter.ts
-import pkg from 'electron';
-const { app, crashReporter } = pkg;
+import electronPkg from 'electron';
+const { app, crashReporter } = electronPkg;
 import * as fs from 'fs';
 import * as path from 'path';
 import { createLogger } from '../../shared/utils/logger.js';

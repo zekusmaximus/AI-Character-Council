@@ -1,4 +1,5 @@
-import { ipcMain } from 'electron';
+import pkg from 'electron';
+const { ipcMain } = pkg;
 import { createLogger } from '../../shared/utils/logger.js';
 import { AppError } from '../../shared/utils/errors/AppError.js';
 import { ErrorHandler } from '../error/ErrorHandler.js';
