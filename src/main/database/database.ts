@@ -2,7 +2,8 @@
 import { PrismaClient } from '@prisma/client';
 import * as path from 'path';
 import * as fs from 'fs';
-import { app } from 'electron';
+import pkg from 'electron';
+const { app } = pkg;
 
 // Get the app data directory
 const userDataPath = app.getPath('userData');
