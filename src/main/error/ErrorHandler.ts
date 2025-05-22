@@ -1,4 +1,5 @@
-import { app, dialog } from 'electron';
+import pkg from 'electron';
+const { app, dialog } = pkg;
 import { createLogger, Logger } from '../../shared/utils/logger.js';
 import { AppError } from '../../shared/utils/errors/AppError.js';
 
