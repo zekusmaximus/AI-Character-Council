@@ -28,7 +28,7 @@ Logger.getInstance({
 const logger = Logger.getInstance();
 
 // Global reference to mainWindow to prevent garbage collection
-let mainWindow: BrowserWindow | null = null;
+let mainWindow: typeof BrowserWindow | null = null;
 
 /**
  * Initialize the application
