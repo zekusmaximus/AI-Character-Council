@@ -50,7 +50,12 @@ export const FormValidationError: React.FC<FormValidationErrorProps> = ({
         }
         
         // Try to navigate deeper if current is an object
-        if (current && typeof current === 'object' && segment in current) {
+        if (
+          current &&
+          typeof current === 'object' &&
+          segment in current &&
+          typeof current[segment] === 'object'
+        ) {
           current = current[segment];
         } else {
           break;

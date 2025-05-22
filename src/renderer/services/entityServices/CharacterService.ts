@@ -25,9 +25,7 @@ export class CharacterService {
       
       // Parse JSON fields for all characters
       return data ? data.map(character => 
-        parseJsonFields(character, {
-          personalityTraits: PersonalityTraitsField
-        })
+        parseJsonFields(character, {})
       ) : [];
     } catch (error) {
       logger.error(`Failed to get characters for project ${projectId}`, error);
@@ -42,9 +40,7 @@ export class CharacterService {
       const data = await invokeIpc<Character>('characters.getById', id);
       
       // Parse JSON fields
-      return data ? parseJsonFields(data, {
-        personalityTraits: PersonalityTraitsField
-      }) : null;
+      return data ? parseJsonFields(data, {}) : null;
     } catch (error) {
       logger.error(`Failed to get character ${id}`, error);
       RendererErrorHandler.handleError(error);
@@ -59,17 +55,13 @@ export class CharacterService {
       const validatedData = validateCharacter(data, 'create');
       
       // Serialize JSON fields
-      const serializedData = serializeJsonFields(validatedData, {
-        personalityTraits: PersonalityTraitsField
-      } as any);
+      const serializedData = serializeJsonFields(validatedData, {} as any);
       
       // Create the character
       const result = await invokeIpc<Character>('characters.create', serializedData);
       
       // Parse JSON fields in the result
-      return result ? parseJsonFields(result, {
-        personalityTraits: PersonalityTraitsField
-      }) : null;
+      return result ? parseJsonFields(result, {}) : null;
     } catch (error) {
       logger.error('Failed to create character', error);
       RendererErrorHandler.handleError(error);
@@ -84,17 +76,13 @@ export class CharacterService {
       const validatedData = validateCharacter({ ...data, id }, 'update');
       
       // Serialize JSON fields
-      const serializedData = serializeJsonFields(validatedData, {
-        personalityTraits: PersonalityTraitsField
-      } as any);
+      const serializedData = serializeJsonFields(validatedData, {} as any);
       
       // Update the character
       const result = await invokeIpc<Character>('characters.update', id, serializedData);
       
       // Parse JSON fields in the result
-      return result ? parseJsonFields(result, {
-        personalityTraits: PersonalityTraitsField
-      }) : null;
+      return result ? parseJsonFields(result, {}) : null;
     } catch (error) {
       logger.error(`Failed to update character ${id}`, error);
       RendererErrorHandler.handleError(error);
@@ -121,9 +109,7 @@ export class CharacterService {
       
       // Parse JSON fields for all characters
       return data ? data.map(character => 
-        parseJsonFields(character, {
-          personalityTraits: PersonalityTraitsField
-        })
+        parseJsonFields(character, {})
       ) : [];
     } catch (error) {
       logger.error(`Failed to search characters by name "${name}"`, error);

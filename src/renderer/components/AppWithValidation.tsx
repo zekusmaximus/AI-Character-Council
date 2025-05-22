@@ -67,7 +67,7 @@ function AppWithValidation() {
       setStatus('Connecting...');
       // @ts-ignore - window.electron is defined in the preload script
       const response = await window.electron.ping();
-      setStatus(`Connection successful: ${response.data}`);      
+      setStatus(`Connection successful: ${response}`);      
     } catch (error) {
       setStatus(`Connection failed: ${error instanceof Error ? error.message : String(error)}`);
 

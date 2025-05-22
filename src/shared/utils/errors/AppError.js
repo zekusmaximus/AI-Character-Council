@@ -1,16 +1,13 @@
-"use strict";
 /**
  * Custom error types for the AI Character Council application
  *
  * These provide structured error information and consistent handling
  * throughout the application.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ConfigurationError = exports.FileSystemError = exports.LlmApiError = exports.ApiError = exports.UnauthorizedError = exports.NotFoundError = exports.ValidationError = exports.DatabaseError = exports.AppError = void 0;
 /**
  * Base application error class that all other errors extend
  */
-class AppError extends Error {
+export class AppError extends Error {
     constructor(message, code = 'INTERNAL_ERROR', options = {}) {
         super(message);
         this.name = this.constructor.name;
@@ -48,11 +45,10 @@ class AppError extends Error {
         };
     }
 }
-exports.AppError = AppError;
 /**
  * Database-related errors
  */
-class DatabaseError extends AppError {
+export class DatabaseError extends AppError {
     constructor(message, code = 'DATABASE_ERROR', options = {}) {
         super(message, code, {
             cause: options.cause,
@@ -66,11 +62,10 @@ class DatabaseError extends AppError {
         });
     }
 }
-exports.DatabaseError = DatabaseError;
 /**
  * Validation errors for input validation failures
  */
-class ValidationError extends AppError {
+export class ValidationError extends AppError {
     constructor(message, validationErrors, options = {}) {
         super(message, 'VALIDATION_ERROR', {
             cause: options.cause,
@@ -83,11 +78,10 @@ class ValidationError extends AppError {
         });
     }
 }
-exports.ValidationError = ValidationError;
 /**
  * Not found errors
  */
-class NotFoundError extends AppError {
+export class NotFoundError extends AppError {
     constructor(entityType, identifier, options = {}) {
         super(`${entityType} not found with identifier: ${identifier}`, 'NOT_FOUND', {
             cause: options.cause,
@@ -101,11 +95,10 @@ class NotFoundError extends AppError {
         });
     }
 }
-exports.NotFoundError = NotFoundError;
 /**
  * Unauthorized errors
  */
-class UnauthorizedError extends AppError {
+export class UnauthorizedError extends AppError {
     constructor(message = 'Unauthorized', options = {}) {
         super(message, 'UNAUTHORIZED', {
             cause: options.cause,
@@ -115,11 +108,10 @@ class UnauthorizedError extends AppError {
         });
     }
 }
-exports.UnauthorizedError = UnauthorizedError;
 /**
  * API errors for external service failures
  */
-class ApiError extends AppError {
+export class ApiError extends AppError {
     constructor(message, options = {}) {
         super(message, 'API_ERROR', {
             cause: options.cause,
@@ -135,11 +127,10 @@ class ApiError extends AppError {
         });
     }
 }
-exports.ApiError = ApiError;
 /**
  * LLM-specific API errors
  */
-class LlmApiError extends ApiError {
+export class LlmApiError extends ApiError {
     constructor(message, options = {}) {
         super(message, {
             cause: options.cause,
@@ -158,11 +149,10 @@ class LlmApiError extends ApiError {
         Object.defineProperty(this, 'code', { value: 'LLM_API_ERROR', writable: false, configurable: false });
     }
 }
-exports.LlmApiError = LlmApiError;
 /**
  * File system errors
  */
-class FileSystemError extends AppError {
+export class FileSystemError extends AppError {
     constructor(message, options = {}) {
         super(message, 'FILESYSTEM_ERROR', {
             cause: options.cause,
@@ -176,11 +166,10 @@ class FileSystemError extends AppError {
         });
     }
 }
-exports.FileSystemError = FileSystemError;
 /**
  * Configuration errors
  */
-class ConfigurationError extends AppError {
+export class ConfigurationError extends AppError {
     constructor(message, options = {}) {
         super(message, 'CONFIGURATION_ERROR', {
             cause: options.cause,
@@ -193,4 +182,3 @@ class ConfigurationError extends AppError {
         });
     }
 }
-exports.ConfigurationError = ConfigurationError;

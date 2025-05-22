@@ -267,14 +267,7 @@ export class CharacterService {
   static async getAll(projectId: string): Promise<Character[]> {
     try {
       const data = await invokeIpc<Character[], 'characters.getAll'>('characters.getAll', projectId);
-      
-      // Parse JSON fields for all characters
-      return data ? data.map(character => 
-        parseJsonFields(character, {
-          personalityTraits: PersonalityTraitsField,
-          characterSheet: CharacterSheetField
-        })
-      ) : [];
+      return data || [];
     } catch (error) {
       logger.error(`Failed to get characters for project ${projectId}`, error);
       RendererErrorHandler.handleError(error);
@@ -286,12 +279,7 @@ export class CharacterService {
   static async getById(id: string): Promise<Character | null> {
     try {
       const data = await invokeIpc<Character, 'characters.getById'>('characters.getById', id);
-      
-      // Parse JSON fields
-      return data ? parseJsonFields(data, {
-        personalityTraits: PersonalityTraitsField,
-        characterSheet: CharacterSheetField
-      }) : null;
+      return data || null;
     } catch (error) {
       logger.error(`Failed to get character ${id}`, error);
       RendererErrorHandler.handleError(error);
@@ -304,21 +292,8 @@ export class CharacterService {
     try {
       // Validate the data
       const validatedData = validateCharacter(data, 'create');
-      
-      // Serialize JSON fields
-      const serializedData = serializeJsonFields(validatedData, {
-        personalityTraits: PersonalityTraitsField,
-        characterSheet: CharacterSheetField
-      } as any);
-      
-      // Create the character
-      const result = await invokeIpc<Character, 'characters.create'>('characters.create', serializedData);
-      
-      // Parse JSON fields in the result
-      return result ? parseJsonFields(result, {
-        personalityTraits: PersonalityTraitsField,
-        characterSheet: CharacterSheetField
-      }) : null;
+      const result = await invokeIpc<Character, 'characters.create'>('characters.create', validatedData);
+      return result || null;
     } catch (error) {
       logger.error('Failed to create character', error);
       RendererErrorHandler.handleError(error);
@@ -331,21 +306,8 @@ export class CharacterService {
     try {
       // Validate the data
       const validatedData = validateCharacter({ ...data, id }, 'update');
-      
-      // Serialize JSON fields
-      const serializedData = serializeJsonFields(validatedData, {
-        personalityTraits: PersonalityTraitsField,
-        characterSheet: CharacterSheetField
-      } as any);
-      
-      // Update the character
-      const result = await invokeIpc<Character, 'characters.update'>('characters.update', id, serializedData);
-      
-      // Parse JSON fields in the result
-      return result ? parseJsonFields(result, {
-        personalityTraits: PersonalityTraitsField,
-        characterSheet: CharacterSheetField
-      }) : null;
+      const result = await invokeIpc<Character, 'characters.update'>('characters.update', id, validatedData);
+      return result || null;
     } catch (error) {
       logger.error(`Failed to update character ${id}`, error);
       RendererErrorHandler.handleError(error);
@@ -369,14 +331,7 @@ export class CharacterService {
   static async searchByName(name: string, projectId?: string): Promise<Character[]> {
     try {
       const data = await invokeIpc<Character[], 'characters.searchByName'>('characters.searchByName', name, projectId);
-      
-      // Parse JSON fields for all characters
-      return data ? data.map(character => 
-        parseJsonFields(character, {
-          personalityTraits: PersonalityTraitsField,
-          characterSheet: CharacterSheetField
-        })
-      ) : [];
+      return data || [];
     } catch (error) {
       logger.error(`Failed to search characters by name "${name}"`, error);
       RendererErrorHandler.handleError(error);

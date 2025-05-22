@@ -1,7 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.logger = exports.Logger = exports.LogLevel = void 0;
-exports.createLogger = createLogger;
 // Environment detection
 const isNode = typeof window === 'undefined' && typeof process !== 'undefined' && process.versions && process.versions.node;
 let app;
@@ -16,14 +12,14 @@ if (isNode) {
     }
 }
 // Define log levels with numeric values for comparison
-var LogLevel;
+export var LogLevel;
 (function (LogLevel) {
     LogLevel[LogLevel["DEBUG"] = 0] = "DEBUG";
     LogLevel[LogLevel["INFO"] = 1] = "INFO";
     LogLevel[LogLevel["WARN"] = 2] = "WARN";
     LogLevel[LogLevel["ERROR"] = 3] = "ERROR";
     LogLevel[LogLevel["FATAL"] = 4] = "FATAL";
-})(LogLevel || (exports.LogLevel = LogLevel = {}));
+})(LogLevel || (LogLevel = {}));
 // Default configuration
 const DEFAULT_CONFIG = {
     minLevel: LogLevel.INFO,
@@ -32,7 +28,7 @@ const DEFAULT_CONFIG = {
     maxFileSize: 5 * 1024 * 1024, // 5MB
     maxFiles: 5,
 };
-class Logger {
+export class Logger {
     constructor(config = {}) {
         this.logDir = null;
         this.currentLogFile = null;
@@ -180,7 +176,7 @@ class Logger {
             const node_fs = require('fs');
             // Check if file needs rotation
             if (this.currentLogSize + entry.length > this.config.maxFileSize) {
-                this.rotateLogFiles(); // rotateLogFiles will use its own require for fs and path
+                this.rotateLogFiles(); // rotateLogFiles will use its own require for fs
             }
             // Append to log file
             if (this.currentLogFile) { // Ensure currentLogFile is not null
@@ -276,11 +272,10 @@ class Logger {
         }
     }
 }
-exports.Logger = Logger;
 // Export a default logger instance
-exports.logger = Logger.getInstance();
+export const logger = Logger.getInstance();
 // Export the createLogger function as a named export
-function createLogger(module) {
+export function createLogger(module) {
     const moduleLogger = Logger.getInstance();
     return {
         debug: (message, data) => moduleLogger.debug(`[${module}] ${message}`, data),

@@ -1,48 +1,12 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateUserSettings = exports.validateTag = exports.validateNote = exports.validateTimelineEvent = exports.validateTimeline = exports.validateConversationMessage = exports.validateConversation = exports.validateCharacterMemory = exports.validateCharacter = exports.validateProject = exports.ValidationUtils = void 0;
-const zod_1 = require("zod");
-const AppError_1 = require("../utils/errors/AppError");
-const logger_1 = require("../utils/logger");
-const schemas = __importStar(require("./schemas"));
-const logger = (0, logger_1.createLogger)('ValidationUtils');
+import { z } from 'zod';
+import { ValidationError } from '../utils/errors/AppError.js';
+import { createLogger } from '../utils/logger.js';
+import * as schemas from './schemas.js';
+const logger = createLogger('ValidationUtils');
 /**
  * Utility functions for data validation
  */
-exports.ValidationUtils = {
+export const ValidationUtils = {
     /**
      * Validate data against a schema
      *
@@ -57,7 +21,7 @@ exports.ValidationUtils = {
             return schema.parse(data);
         }
         catch (error) {
-            if (error instanceof zod_1.z.ZodError) {
+            if (error instanceof z.ZodError) {
                 // Format validation errors
                 const validationErrors = {};
                 error.errors.forEach(issue => {
@@ -72,7 +36,7 @@ exports.ValidationUtils = {
                     errors: validationErrors,
                     data
                 });
-                throw new AppError_1.ValidationError(message, validationErrors, { context: { ...options.context, data } });
+                throw new ValidationError(message, validationErrors, { context: { ...options.context, data } });
             }
             throw error;
         }
@@ -127,7 +91,7 @@ exports.ValidationUtils = {
      */
     validateId(id, entity = 'record') {
         if (typeof id !== 'string' || !id) {
-            throw new AppError_1.ValidationError(`Invalid ${entity} ID`, { id: 'ID must be a non-empty string' });
+            throw new ValidationError(`Invalid ${entity} ID`, { id: 'ID must be a non-empty string' });
         }
         return id;
     },
@@ -154,23 +118,13 @@ exports.ValidationUtils = {
 /**
  * Helper functions for specific data types
  */
-const validateProject = (data, operation = 'save') => exports.ValidationUtils.validate(schemas.projectSchema, data, { entity: 'project', operation });
-exports.validateProject = validateProject;
-const validateCharacter = (data, operation = 'save') => exports.ValidationUtils.validate(schemas.characterSchema, data, { entity: 'character', operation });
-exports.validateCharacter = validateCharacter;
-const validateCharacterMemory = (data, operation = 'save') => exports.ValidationUtils.validate(schemas.characterMemorySchema, data, { entity: 'memory', operation });
-exports.validateCharacterMemory = validateCharacterMemory;
-const validateConversation = (data, operation = 'save') => exports.ValidationUtils.validate(schemas.conversationSchema, data, { entity: 'conversation', operation });
-exports.validateConversation = validateConversation;
-const validateConversationMessage = (data, operation = 'save') => exports.ValidationUtils.validate(schemas.conversationMessageSchema, data, { entity: 'message', operation });
-exports.validateConversationMessage = validateConversationMessage;
-const validateTimeline = (data, operation = 'save') => exports.ValidationUtils.validate(schemas.timelineSchema, data, { entity: 'timeline', operation });
-exports.validateTimeline = validateTimeline;
-const validateTimelineEvent = (data, operation = 'save') => exports.ValidationUtils.validate(schemas.timelineEventSchema, data, { entity: 'event', operation });
-exports.validateTimelineEvent = validateTimelineEvent;
-const validateNote = (data, operation = 'save') => exports.ValidationUtils.validate(schemas.noteSchema, data, { entity: 'note', operation });
-exports.validateNote = validateNote;
-const validateTag = (data, operation = 'save') => exports.ValidationUtils.validate(schemas.tagSchema, data, { entity: 'tag', operation });
-exports.validateTag = validateTag;
-const validateUserSettings = (data, operation = 'save') => exports.ValidationUtils.validate(schemas.userSettingsSchema, data, { entity: 'settings', operation });
-exports.validateUserSettings = validateUserSettings;
+export const validateProject = (data, operation = 'save') => ValidationUtils.validate(schemas.projectSchema, data, { entity: 'project', operation });
+export const validateCharacter = (data, operation = 'save') => ValidationUtils.validate(schemas.characterSchema, data, { entity: 'character', operation });
+export const validateCharacterMemory = (data, operation = 'save') => ValidationUtils.validate(schemas.characterMemorySchema, data, { entity: 'memory', operation });
+export const validateConversation = (data, operation = 'save') => ValidationUtils.validate(schemas.conversationSchema, data, { entity: 'conversation', operation });
+export const validateConversationMessage = (data, operation = 'save') => ValidationUtils.validate(schemas.conversationMessageSchema, data, { entity: 'message', operation });
+export const validateTimeline = (data, operation = 'save') => ValidationUtils.validate(schemas.timelineSchema, data, { entity: 'timeline', operation });
+export const validateTimelineEvent = (data, operation = 'save') => ValidationUtils.validate(schemas.timelineEventSchema, data, { entity: 'event', operation });
+export const validateNote = (data, operation = 'save') => ValidationUtils.validate(schemas.noteSchema, data, { entity: 'note', operation });
+export const validateTag = (data, operation = 'save') => ValidationUtils.validate(schemas.tagSchema, data, { entity: 'tag', operation });
+export const validateUserSettings = (data, operation = 'save') => ValidationUtils.validate(schemas.userSettingsSchema, data, { entity: 'settings', operation });

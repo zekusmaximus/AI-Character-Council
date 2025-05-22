@@ -4,10 +4,19 @@ import { app as electronApp } from 'electron';
 const isNode = typeof window === 'undefined' && typeof process !== 'undefined' && process.versions && process.versions.node;
 
 let app: typeof electronApp | undefined;
+let node_os: any;
+let node_path: any;
+let node_fs: any;
+
+async function ensureNodeModules() {
+  if (!node_os) node_os = (await import('os'));
+  if (!node_path) node_path = (await import('path'));
+  if (!node_fs) node_fs = (await import('fs'));
+}
+
 if (isNode) {
   try {
-    // Dynamically require electron only in Node.js environment
-    app = require('electron').app;
+    app = electronApp;
   } catch (e) {
     console.warn("Running in Node.js environment but 'electron' module is not available. File logging features might be limited.");
     app = undefined;
@@ -50,33 +59,13 @@ export class Logger {
   private currentLogSize: number = 0;
   
   private constructor(config: Partial<LoggerConfig> = {}) {
+    // Assign config first
     this.config = { ...DEFAULT_CONFIG, ...config };
 
+    // All code using this.config is after assignment
     if (isNode && this.config.logToFile) {
-      const node_os = require('os');
-      const node_path = require('path');
-      const node_fs = require('fs');
-
-      // Set up log directory
-      if (this.config.logDirectory) {
-        this.logDir = this.config.logDirectory;
-      } else {
-        const userDataPath = app?.getPath('userData') || node_path.join(node_os.homedir(), '.ai-character-council');
-        this.logDir = node_path.join(userDataPath, 'logs');
-      }
-      
-      // Ensure log directory exists
-      if (this.logDir && !node_fs.existsSync(this.logDir)) {
-        node_fs.mkdirSync(this.logDir, { recursive: true });
-      }
-      
-      this.currentLogFile = this.getLogFilePath(); // getLogFilePath will also use require for path
-      
-      // Check if file exists and get its size
-      if (this.currentLogFile && node_fs.existsSync(this.currentLogFile)) {
-        const stats = node_fs.statSync(this.currentLogFile);
-        this.currentLogSize = stats.size;
-      }
+      // Use a helper function to avoid referencing this.config before assignment
+      this.setupFileLogging();
     } else {
       this.config.logToFile = false; // Disable file logging if not in Node.js or explicitly disabled
     }
@@ -89,6 +78,27 @@ export class Logger {
       version: app?.getVersion() || 'unknown',
       isNode,
     });
+  }
+  
+  private async setupFileLogging() {
+    await ensureNodeModules();
+    // Set up log directory
+    if (this.config.logDirectory) {
+      this.logDir = this.config.logDirectory;
+    } else {
+      const userDataPath = app?.getPath('userData') || node_path.join(node_os.homedir(), '.ai-character-council');
+      this.logDir = node_path.join(userDataPath, 'logs');
+    }
+    // Ensure log directory exists
+    if (this.logDir && !node_fs.existsSync(this.logDir)) {
+      node_fs.mkdirSync(this.logDir, { recursive: true });
+    }
+    this.currentLogFile = this.getLogFilePath();
+    // Check if file exists and get its size
+    if (this.currentLogFile && node_fs.existsSync(this.currentLogFile)) {
+      const stats = node_fs.statSync(this.currentLogFile);
+      this.currentLogSize = stats.size;
+    }
   }
   
   /**
@@ -204,19 +214,18 @@ export class Logger {
   /**
    * Log to the current log file and handle rotation if needed
    */
-  private logToFile(entry: string): void {
+  private async logToFile(entry: string): Promise<void> {
     if (!isNode || !this.config.logToFile || !this.currentLogFile || !this.logDir) {
       return; // Skip file logging if not in Node, disabled, or paths not set
     }
     try {
-      const node_fs = require('fs');
+      await ensureNodeModules();
       // Check if file needs rotation
       if (this.currentLogSize + entry.length > this.config.maxFileSize) {
-        this.rotateLogFiles(); // rotateLogFiles will use its own require for fs
+        await this.rotateLogFiles();
       }
-      
       // Append to log file
-      if (this.currentLogFile) { // Ensure currentLogFile is not null
+      if (this.currentLogFile) {
         node_fs.appendFileSync(this.currentLogFile, entry);
         this.currentLogSize += entry.length;
       }
@@ -231,31 +240,26 @@ export class Logger {
   /**
    * Rotate log files when current file exceeds max size
    */
-  private rotateLogFiles(): void {
+  private async rotateLogFiles(): Promise<void> {
     if (!isNode || !this.config.logToFile || !this.logDir) {
       return;
     }
     try {
-      const node_fs = require('fs');
-      const node_path = require('path');
-      const files = this.getExistingLogFiles(); // getExistingLogFiles will use its own require for fs
-      if (files === null) return; // Could not get existing files
-      
-      // Remove oldest file if we're at max files
+      await ensureNodeModules();
+      const files = this.getExistingLogFiles();
+      if (files === null) return;
       if (files.length >= this.config.maxFiles) {
         files.sort();
         const oldestFile = files[0];
-        if (this.logDir) { // Ensure logDir is not null
+        if (this.logDir) {
           node_fs.unlinkSync(node_path.join(this.logDir, oldestFile));
         }
       }
-      
-      // Create new log file
-      this.currentLogFile = this.getLogFilePath(); // getLogFilePath will use its own require for path
+      this.currentLogFile = this.getLogFilePath();
       this.currentLogSize = 0;
     } catch (err) {
       console.error('Failed to rotate log files:', err);
-      this.config.logToFile = false; // Disable further file logging attempts
+      this.config.logToFile = false;
     }
   }
   
@@ -267,12 +271,12 @@ export class Logger {
       return null;
     }
     try {
-      const node_fs = require('fs');
+      if (!node_fs) return null;
       return node_fs.readdirSync(this.logDir)
         .filter((file: string) => file.startsWith('app-') && file.endsWith('.log'));
     } catch (err) {
       console.error('Failed to read log directory:', err);
-      this.config.logToFile = false; // Disable file logging
+      this.config.logToFile = false;
       return null;
     }
   }
@@ -284,7 +288,7 @@ export class Logger {
     if (!isNode || !this.logDir) {
       return null;
     }
-    const node_path = require('path');
+    if (!node_path) return null;
     const date = new Date();
     const timestamp = date.toISOString().replace(/:/g, '-').replace(/\..+/, '');
     return node_path.join(this.logDir, `app-${timestamp}.log`);

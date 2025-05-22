@@ -61,7 +61,7 @@ function App() {
       setStatus('Connecting...');
       // @ts-ignore - window.electron is defined in the preload script
       const response = await window.electron.ping();
-      setStatus(`Connection successful: ${response.message}`);      
+      setStatus(`Connection successful: ${response}`);      
     } catch (error) {
       setStatus(`Connection failed: ${error instanceof Error ? error.message : String(error)}`);
       setErrorDemo(null);
@@ -93,8 +93,16 @@ function App() {
         case 'network':
           // Simulate network error
           fetch('https://non-existent-domain-12345.com')
-            .then(response => response.json())
-            .then(data => console.log(data));
+            .then(async response => {
+              if (!response.ok) {
+                await RendererErrorHandler.handleApiError(response);
+              }
+              return response.json();
+            })
+            .then(data => console.log(data))
+            .catch(error => {
+              RendererErrorHandler.handleError(error);
+            });
           break;
           
         default:

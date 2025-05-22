@@ -22,12 +22,27 @@ export interface Project {
   updatedAt: string;
 }
 
+export interface PersonalityTrait {
+  id: string;
+  characterId: string;
+  name: string;
+  value: string;
+}
+
+export interface CharacterAttribute {
+  id: string;
+  characterId: string;
+  name: string;
+  value: string;
+}
+
 export interface Character {
   id: string;
   projectId: string;
   name: string;
   bio?: string;
-  personalityTraits: string | any; // Will be parsed from JSON string
+  personalityTraits: PersonalityTrait[];
+  characterAttributes: CharacterAttribute[];
   characterSheet?: string | any; // Will be parsed from JSON string
   image?: string;
   createdAt: string;

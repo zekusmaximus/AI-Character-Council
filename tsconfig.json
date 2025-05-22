@@ -19,7 +19,8 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "types": ["node"]
+    "types": ["node"],
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src", "src/renderer/types/electron.d.ts", "node_modules/.prisma/client"],
   "references": [{ "path": "./tsconfig.node.json" }]
