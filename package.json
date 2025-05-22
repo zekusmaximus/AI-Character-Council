@@ -6,7 +6,6 @@
   "author": "Your Name",
   "license": "MIT",
   "private": true,
-  "type": "module",
   "scripts": {
     "dev": "concurrently \"npm run dev:vite\" \"npm run dev:electron\"",
     "dev:vite": "vite",
@@ -74,7 +73,8 @@
     "productName": "AI Character Council",
     "copyright": "Copyright © 2025",
     "files": [
-      "build/**/*",
+      "build/main/**/*",
+      "build/renderer/**/*",
       "prisma/**/*",
       "node_modules/**/*",
       "package.json"

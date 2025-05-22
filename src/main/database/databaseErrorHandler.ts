@@ -1,18 +1,18 @@
-import {
+const {
   PrismaClientKnownRequestError,
   PrismaClientValidationError,
   PrismaClientInitializationError,
   PrismaClientRustPanicError
-} from '@prisma/client/runtime/library';
-import { DatabaseError, NotFoundError, ValidationError } from '../../shared/utils/errors/AppError.js';
-import { createLogger } from '../../shared/utils/logger.js';
+} = require('@prisma/client/runtime/library');
+const { DatabaseError, NotFoundError, ValidationError } = require('../../shared/utils/errors/AppError');
+const { createLogger } = require('../../shared/utils/logger');
 
 const logger = createLogger('DatabaseErrorHandler');
 
 /**
  * Handle and standardize Prisma database errors
  */
-export function handleDatabaseError(
+function handleDatabaseError(
   error: any,
   options: {
     operation?: string;
@@ -182,11 +182,12 @@ export function handleDatabaseError(
     }
   );
 }
+exports.handleDatabaseError = handleDatabaseError;
 
 /**
  * Higher-order function to wrap database operations with error handling
  */
-export function withDatabaseErrorHandling<T>(
+function withDatabaseErrorHandling<T>(
   fn: () => Promise<T>,
   options: {
     operation?: string;
@@ -201,6 +202,7 @@ export function withDatabaseErrorHandling<T>(
     throw error;
   });
 }
+exports.withDatabaseErrorHandling = withDatabaseErrorHandling;
 
 /**
  * Sanitize potentially sensitive data for logging

@@ -23,7 +23,7 @@ export default defineConfig({
     port: 3000
   },
   build: {
-    outDir: 'build',
+    outDir: 'build/renderer',
     sourcemap: true,
     rollupOptions: {
       input: path.resolve(__dirname, 'public/index.html'),

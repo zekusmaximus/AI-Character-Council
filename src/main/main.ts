@@ -1,20 +1,15 @@
 
-import pkg from 'electron';
-const { app, BrowserWindow } = pkg;
-import * as path from 'path';
-import * as isDev from 'electron-is-dev';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const { app, BrowserWindow } = require('electron');
+const path = require('path');
+const isDev = require('electron-is-dev');
 
 // Import error handling and logging
-import { initDatabase } from './services/initDatabase.js';
-import { Logger, LogLevel } from '../shared/utils/logger.js';
-import { ErrorHandler } from './error/ErrorHandler.js';
-import { ErrorMonitoring } from './error/ErrorMonitoring.js';
-import { initCoreIpcHandlers } from './ipc/ipcHandler.js';
-import { initEntityIpcHandlers } from './ipc/initEntityIpcHandlers.js';
+const { initDatabase } = require('./services/initDatabase');
+const { Logger, LogLevel } = require('../shared/utils/logger');
+const { ErrorHandler } = require('./error/ErrorHandler');
+const { ErrorMonitoring } = require('./error/ErrorMonitoring');
+const { initCoreIpcHandlers } = require('./ipc/ipcHandler');
+const { initEntityIpcHandlers } = require('./ipc/initEntityIpcHandlers');
 
 // Configure global logger
 const logLevel = isDev ? LogLevel.DEBUG : LogLevel.INFO;
@@ -109,7 +104,7 @@ async function createWindow() {
   // Load the index.html from React dev server or the built file
   const startURL = isDev 
     ? 'http://localhost:3000' 
-    : `file://${path.join(__dirname, '../index.html')}`;
+  : `file://${path.join(__dirname, '../renderer/index.html')}`;
   
   try {
     if (mainWindow) {
