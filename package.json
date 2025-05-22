@@ -74,7 +74,8 @@
     "productName": "AI Character Council",
     "copyright": "Copyright © 2025",
     "files": [
-      "build/**/*",
+      "build/main/**/*",
+      "build/renderer/**/*",
       "prisma/**/*",
       "node_modules/**/*",
       "package.json"

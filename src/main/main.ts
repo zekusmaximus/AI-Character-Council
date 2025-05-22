@@ -1,8 +1,7 @@
 
-import pkg from 'electron';
-const { app, BrowserWindow } = pkg;
+import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
-import * as isDev from 'electron-is-dev';
+import isDev from 'electron-is-dev';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -109,7 +108,7 @@ async function createWindow() {
   // Load the index.html from React dev server or the built file
   const startURL = isDev 
     ? 'http://localhost:3000' 
-    : `file://${path.join(__dirname, '../index.html')}`;
+  : `file://${path.join(__dirname, '../renderer/index.html')}`;
   
   try {
     if (mainWindow) {
