@@ -24,7 +24,7 @@ import {
   validateUserSettings
 } from '../../shared/validation';
 
-import { createLogger } from '../../shared/utils/logger';
+import { createLogger } from '../../shared/utils/logger.ts';
 import { handleDatabaseError } from 'src/main/database/databaseErrorHandler';
 import { PersonalityTraitsField, CharacterSheetField } from '../../shared/utils/jsonUtils';
 
