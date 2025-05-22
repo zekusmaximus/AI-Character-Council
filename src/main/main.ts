@@ -12,6 +12,7 @@ import { Logger, LogLevel } from '../shared/utils/logger.js';
 import { ErrorHandler } from './error/ErrorHandler.js';
 import { ErrorMonitoring } from './error/ErrorMonitoring.js';
 import { initCoreIpcHandlers } from './ipc/ipcHandler.js';
+import { initEntityIpcHandlers } from './ipc/initEntityIpcHandlers.js';
 
 // Configure global logger
 const logLevel = isDev ? LogLevel.DEBUG : LogLevel.INFO;
@@ -46,6 +47,8 @@ async function initApp() {
     
     // Initialize core IPC handlers
     initCoreIpcHandlers();
+    // Initialize entity IPC handlers
+    initEntityIpcHandlers();
     
     // Initialize database (wrapped in error handler)
     await initDatabase().catch((error: Error) => {
@@ -75,7 +78,7 @@ async function createWindow() {
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
-      preload: path.join(__dirname, '../preload.js')
+      preload: path.join(__dirname, 'preload.js')
     },
     show: false, // Don't show until ready-to-show
   });

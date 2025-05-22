@@ -10,10 +10,10 @@
   "scripts": {
     "dev": "concurrently \"npm run dev:vite\" \"npm run dev:electron\"",
     "dev:vite": "vite",
-    "dev:electron": "tsc -p electron-tsconfig.json && electron .",
+    "dev:electron": "tsc -p electron-tsconfig.json --skipLibCheck && electron .",
     "build": "npm run build:vite && npm run build:electron",
     "build:vite": "vite build",
-    "build:electron": "tsc -p electron-tsconfig.json",
+    "build:electron": "tsc -p electron-tsconfig.json --skipLibCheck",
     "preview": "vite preview",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src",
     "lint:fix": "eslint --ext .js,.jsx,.ts,.tsx src --fix",

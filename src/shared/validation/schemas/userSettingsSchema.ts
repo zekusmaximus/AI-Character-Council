@@ -1,6 +1,7 @@
 // src/shared/validation/schemas/userSettingsSchema.ts
 
 import { z } from 'zod';
+import { ValidationError } from '../../utils/errors/AppError.js';
 
 // Define the schema for UserSettings validation
 export const userSettingsSchema = z.object({
@@ -39,7 +40,6 @@ export const validateUserSettings = (data: unknown, operation: string = 'save'):
       });
       
       // Create a validation error
-      const ValidationError = require('../../utils/errors/AppError').ValidationError;
       throw new ValidationError(
         errorMessage,
         validationErrors,

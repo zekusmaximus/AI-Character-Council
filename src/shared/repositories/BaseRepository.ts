@@ -3,6 +3,7 @@ import { prisma } from '../../main/database/database.js';
 import { handleDatabaseError } from '../../main/database/databaseErrorHandler.js';
 import { createLogger } from '../utils/logger.js';
 import { z } from 'zod';
+import { ValidationError } from '../utils/errors/AppError.js';
 
 const logger = createLogger('BaseRepository');
 
@@ -41,7 +42,6 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
         const errorMessage = `Validation failed for ${this.tableName} during ${operation}: ${Object.values(formattedErrors).join(', ')}`;
         logger.error(errorMessage, { errors: formattedErrors, data });
         
-        const ValidationError = require('../utils/errors/AppError').ValidationError;
         throw new ValidationError(
           errorMessage,
           formattedErrors,

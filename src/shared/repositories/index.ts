@@ -8,6 +8,8 @@ import { MemoryRepository } from './MemoryRepository.js';
 import { ConversationRepository, ConversationMessageRepository } from './ConversationRepository.js';
 import { TimelineRepository, TimelineEventRepository } from './TimelineRepository.js';
 import { ProjectRepository } from './ProjectRepository.js';
+import { UserSettingsRepository } from './UserSettingsRepository.js';
+import { VectorDatabaseRepository } from './VectorDatabaseRepository.js';
 
 // Export repository classes
 export {
@@ -29,6 +31,8 @@ const messageRepository = new ConversationMessageRepository();
 const timelineRepository = new TimelineRepository();
 const eventRepository = new TimelineEventRepository();
 const projectRepository = new ProjectRepository();
+const userSettingsRepository = new UserSettingsRepository();
+const vectorDatabaseRepository = new VectorDatabaseRepository();
 
 // Export instances
 export {
@@ -38,5 +42,7 @@ export {
   messageRepository,
   timelineRepository,
   eventRepository,
-  projectRepository
+  projectRepository,
+  userSettingsRepository,
+  vectorDatabaseRepository
 };

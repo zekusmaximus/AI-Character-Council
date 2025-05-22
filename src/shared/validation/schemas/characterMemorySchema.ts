@@ -1,6 +1,7 @@
 // src/shared/validation/schemas/characterMemorySchema.ts
 
 import { z } from 'zod';
+import { ValidationError } from '../../utils/errors/AppError.js';
 
 // Define the schema for CharacterMemory validation
 export const characterMemorySchema = z.object({
@@ -57,7 +58,6 @@ export const validateCharacterMemory = (data: unknown, operation: string = 'save
       });
       
       // Create a validation error
-      const ValidationError = require('../../utils/errors/AppError').ValidationError;
       throw new ValidationError(
         errorMessage,
         validationErrors,

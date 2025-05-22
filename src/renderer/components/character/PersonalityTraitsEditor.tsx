@@ -1,7 +1,6 @@
 // src/renderer/components/character/PersonalityTraitsEditor.tsx
 
 import React, { useState, useEffect } from 'react';
-import { useLogger } from '../../utils/LoggerProvider';
 import { PersonalityTraitsField } from '../../../shared/utils/jsonUtils';
 
 interface PersonalityTrait {
@@ -20,8 +19,6 @@ export const PersonalityTraitsEditor: React.FC<PersonalityTraitsProps> = ({
   onChange,
   readOnly = false
 }) => {
-  const logger = useLogger().createComponentLogger('PersonalityTraitsEditor');
-  
   // Create a default structure if none provided
   const defaultTraits = PersonalityTraitsField.parse('{}');
   

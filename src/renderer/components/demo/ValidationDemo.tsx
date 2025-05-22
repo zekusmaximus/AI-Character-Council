@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { 
   ValidatedInput, 
   ValidatedTextarea, 
-  ValidatedSelect 
 } from '../form/ValidatedInput';
 import { 
   FormValidationProvider,
@@ -108,7 +107,9 @@ export const ValidationDemo: React.FC = () => {
       await ProjectService.create(emptyProject);
     } catch (error) {
       // Set the error in the form validation context
-      setErrors(error.validationErrors || {});
+      if (error && typeof error === 'object' && 'validationErrors' in error) {
+        setErrors((error as any).validationErrors || {});
+      }
       
       // Also show the error dialog
       setCurrentError(error);
@@ -126,13 +127,16 @@ export const ValidationDemo: React.FC = () => {
       const invalidCharacter = { 
         ...characterFormData,
         projectId: characterFormData.projectId || '00000000-0000-0000-0000-000000000000', // Invalid UUID
-        name: '' // Required field
+        name: '', // Required field
+        image: null,
       };
       
       await CharacterService.create(invalidCharacter);
     } catch (error) {
       // Set the error in the form validation context
-      setErrors(error.validationErrors || {});
+      if (error && typeof error === 'object' && 'validationErrors' in error) {
+        setErrors((error as any).validationErrors || {});
+      }
       
       // Also show the error dialog
       setCurrentError(error);

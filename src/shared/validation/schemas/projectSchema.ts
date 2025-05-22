@@ -1,7 +1,7 @@
-
 // src/shared/validation/schemas/projectSchema.ts
 
 import { z } from 'zod';
+import { ValidationError } from '../../utils/errors/AppError.js';
 
 // Define the schema for Project validation
 export const projectSchema = z.object({
@@ -31,7 +31,6 @@ export const validateProject = (data: unknown, operation: string = 'save'): Proj
       });
       
       // Create a validation error
-      const ValidationError = require('../../utils/errors/AppError').ValidationError;
       throw new ValidationError(
         errorMessage,
         validationErrors,

@@ -1,6 +1,7 @@
 // src/shared/validation/schemas/vectorDatabaseSchema.ts
 
 import { z } from 'zod';
+import { ValidationError } from '../../utils/errors/AppError.js';
 
 // Define the schema for VectorDatabase validation
 export const vectorDatabaseSchema = z.object({
@@ -38,7 +39,6 @@ export const validateVectorDatabase = (data: unknown, operation: string = 'save'
       });
       
       // Create a validation error
-      const ValidationError = require('../../utils/errors/AppError').ValidationError;
       throw new ValidationError(
         errorMessage,
         validationErrors,

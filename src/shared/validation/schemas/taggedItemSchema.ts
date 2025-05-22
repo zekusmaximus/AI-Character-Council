@@ -1,6 +1,7 @@
 // src/shared/validation/schemas/taggedItemSchema.ts
 
 import { z } from 'zod';
+import { ValidationError } from '../../utils/errors/AppError.js';
 
 // Define the schema for TaggedItem validation
 export const taggedItemSchema = z.object({
@@ -36,7 +37,6 @@ export const validateTaggedItem = (data: unknown, operation: string = 'save'): T
       });
       
       // Create a validation error
-      const ValidationError = require('../../utils/errors/AppError').ValidationError;
       throw new ValidationError(
         errorMessage,
         validationErrors,

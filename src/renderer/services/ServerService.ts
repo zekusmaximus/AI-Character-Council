@@ -4,15 +4,10 @@ import {
   projectRepository,
   characterRepository,
   memoryRepository,
-  conversationRepository,
+  ConversationRepository,
   messageRepository,
   timelineRepository,
-  eventRepository,
-  noteRepository,
-  tagRepository,
-  taggedItemRepository,
-  settingsRepository,
-  vectorRepository
+  eventRepository
 } from '../../shared/repositories';
 
 import { 
@@ -127,7 +122,9 @@ export class ServerService {
   // Character services
   static async getCharactersByProject(projectId: string) {
     try {
-      return await characterRepository.getAllByProject(projectId);
+      // return await characterRepository.getAllByProject(projectId);
+      // Use getAll as a fallback or reimplement as needed
+      return await characterRepository.getAll({ where: { projectId } });
     } catch (error) {
       return handleDatabaseError(error, {
         operation: 'getCharactersByProject',
@@ -139,14 +136,11 @@ export class ServerService {
 
   static async getCharacterById(id: string) {
     try {
-      const character = await characterRepository.getByIdWithRelations(id);
-
-      // Parse JSON fields
-      if (character) {
-        return characterRepository.parseCharacter(character);
-      }
-
-      return null;
+      const character = await characterRepository.getById(id);
+      // if (character) {
+      //   return characterRepository.parseCharacter(character);
+      // }
+      return character;
     } catch (error) {
       return handleDatabaseError(error, {
         operation: 'getCharacterById',
@@ -161,17 +155,17 @@ export class ServerService {
       // Validate character data
       const validatedData = validateCharacter(data, 'create');
 
-      // Handle JSON fields
-      if (validatedData.personalityTraits && typeof validatedData.personalityTraits !== 'string') {
-        validatedData.personalityTraits = PersonalityTraitsField.serialize(validatedData.personalityTraits);
-      }
-
-      if (validatedData.characterSheet && typeof validatedData.characterSheet !== 'string') {
-        validatedData.characterSheet = CharacterSheetField.serialize(validatedData.characterSheet);
-      }
+      // Prepare nested writes for relations
+      const { personalityTraits, characterAttributes, ...characterData } = validatedData;
+      const createData = {
+        ...characterData,
+        project: { connect: { id: characterData.projectId } },
+        ...(personalityTraits ? { personalityTraits: { create: personalityTraits } } : {}),
+        ...(characterAttributes ? { characterAttributes: { create: characterAttributes } } : {}),
+      };
 
       // Create character
-      return await characterRepository.create(validatedData);
+      return await characterRepository.create(createData);
     } catch (error) {
       if (typeof error === 'object' && error !== null && 'name' in error && (error as any).name === 'ValidationError') throw error;
 
@@ -188,16 +182,16 @@ export class ServerService {
       // Validate character data
       const validatedData = validateCharacter({ ...data, id }, 'update');
 
-      // Handle JSON fields
-      if (validatedData.personalityTraits && typeof validatedData.personalityTraits !== 'string') {
-        validatedData.personalityTraits = PersonalityTraitsField.serialize(validatedData.personalityTraits);
-      }
-
-      // Character attributes are now handled as a relational field
-      // No serialization needed as they're stored in their own table
+      // Prepare nested updates for relations
+      const { personalityTraits, characterAttributes, ...characterData } = validatedData;
+      const updateData = {
+        ...characterData,
+        // TODO: Add nested update logic for relations if needed
+        // e.g., personalityTraits: { update: ... }, characterAttributes: { update: ... }
+      };
 
       // Update character
-      return await characterRepository.update(id, validatedData);
+      return await characterRepository.update(id, updateData);
     } catch (error) {
       if (typeof error === 'object' && error !== null && 'name' in error && (error as any).name === 'ValidationError') throw error;
 
@@ -242,34 +236,8 @@ export class ServerService {
   // would follow the same pattern as above
 
   // Example for user settings
-  static async getUserSettings() {
-    try {
-      return await settingsRepository.getCurrent();
-    } catch (error) {
-      return handleDatabaseError(error, {
-        operation: 'getUserSettings',
-        table: 'userSettings'
-      });
-    }
-  }
-
-  static async updateUserSettings(data: any) {
-    try {
-      // Validate settings data
-      const validatedData = validateUserSettings(data, 'update');
-
-      // Update settings
-      return await settingsRepository.updateSettings(validatedData);
-    } catch (error) {
-      if (typeof error === 'object' && error !== null && 'name' in error && (error as any).name === 'ValidationError') throw error;
-
-      return handleDatabaseError(error, {
-        operation: 'updateUserSettings',
-        table: 'userSettings',
-        data
-      });
-    }
-  }
+  // static async getUserSettings() { ... }
+  // static async updateUserSettings(data: any) { ... }
 }
 
 // Export a singleton instance

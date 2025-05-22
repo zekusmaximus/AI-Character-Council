@@ -1,6 +1,7 @@
 // src/shared/validation/schemas/tagSchema.ts
 
 import { z } from 'zod';
+import { ValidationError } from '../../utils/errors/AppError.js';
 
 // Define color hex pattern
 const colorHexPattern = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
@@ -39,7 +40,6 @@ export const validateTag = (data: unknown, operation: string = 'save'): TagInput
       });
       
       // Create a validation error
-      const ValidationError = require('../../utils/errors/AppError').ValidationError;
       throw new ValidationError(
         errorMessage,
         validationErrors,
