@@ -1,5 +1,6 @@
 
-import { app, BrowserWindow } from 'electron';
+import pkg from 'electron';
+const { app, BrowserWindow } = pkg;
 import * as path from 'path';
 import * as isDev from 'electron-is-dev';
 import { fileURLToPath } from 'url';
