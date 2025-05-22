@@ -8,13 +8,28 @@ let node_os: any;
 let node_path: any;
 let node_fs: any;
 
-async function ensureNodeModules() {
-  if (!node_os) node_os = (await import('os'));
-  if (!node_path) node_path = (await import('path'));
-  if (!node_fs) node_fs = (await import('fs'));
-}
-
+// Conditionally define and import Node.js specific modules
 if (isNode) {
+  // These variables will only be defined in a Node.js environment
+  let _node_os: typeof import('os');
+  let _node_path: typeof import('path');
+  let _node_fs: typeof import('fs');
+
+  // This function will only be defined and used in a Node.js environment
+  const ensureNodeModules = async () => {
+    if (!_node_os) _node_os = await import('os');
+    if (!_node_path) _node_path = await import('path');
+    if (!_node_fs) _node_fs = await import('fs');
+    // Assign to outer scope variables for use in the class
+    node_os = _node_os;
+    node_path = _node_path;
+    node_fs = _node_fs;
+  };
+
+  // Make ensureNodeModules available to the class instance methods that need it
+  // We'll call this within the constructor and other methods if needed
+  (globalThis as any).__ensureNodeModules = ensureNodeModules;
+
   try {
     app = electronApp;
   } catch (e) {
@@ -81,7 +96,9 @@ export class Logger {
   }
   
   private async setupFileLogging() {
-    await ensureNodeModules();
+    if (isNode && (globalThis as any).__ensureNodeModules) {
+      await (globalThis as any).__ensureNodeModules();
+    }
     // Set up log directory
     if (this.config.logDirectory) {
       this.logDir = this.config.logDirectory;
@@ -219,7 +236,9 @@ export class Logger {
       return; // Skip file logging if not in Node, disabled, or paths not set
     }
     try {
-      await ensureNodeModules();
+      if (isNode && (globalThis as any).__ensureNodeModules) {
+        await (globalThis as any).__ensureNodeModules();
+      }
       // Check if file needs rotation
       if (this.currentLogSize + entry.length > this.config.maxFileSize) {
         await this.rotateLogFiles();
@@ -245,7 +264,9 @@ export class Logger {
       return;
     }
     try {
-      await ensureNodeModules();
+      if (isNode && (globalThis as any).__ensureNodeModules) {
+        await (globalThis as any).__ensureNodeModules();
+      }
       const files = this.getExistingLogFiles();
       if (files === null) return;
       if (files.length >= this.config.maxFiles) {
