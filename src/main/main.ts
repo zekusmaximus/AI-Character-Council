@@ -27,7 +27,7 @@ Logger.getInstance({
 const logger = Logger.getInstance();
 
 // Global reference to mainWindow to prevent garbage collection
-let mainWindow: BrowserWindow | null = null;
+let mainWindow: typeof BrowserWindow | null = null;
 
 /**
  * Initialize the application
@@ -85,7 +85,7 @@ async function createWindow() {
   });
 
   // Handle window creation errors
-  mainWindow.webContents.on('did-fail-load', (errorCode, errorDescription) => {
+  mainWindow.webContents.on('did-fail-load', (errorCode: number, errorDescription: string) => {
     logger.error('Window failed to load', { errorCode, errorDescription });
     if (mainWindow) {
       mainWindow.webContents.openDevTools();

@@ -3,6 +3,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 // Expose safe APIs for use in the renderer process
 contextBridge.exposeInMainWorld('electron', {
+  // Explicitly type the exposed API
   // Basic connection test
   ping: () => ipcRenderer.invoke('ping'),
   
