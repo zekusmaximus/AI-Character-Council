@@ -4,8 +4,7 @@ const { app: electronApp } = electronPkg;
 // Environment detection
 const isNode = typeof window === 'undefined' && typeof process !== 'undefined' && process.versions && process.versions.node;
 
-// Import electron as a default import first
-import electronPkg from 'electron';
+// Conditionally define and import Node.js specific modules
 let app: typeof electronPkg.app | undefined;
 let node_os: any;
 let node_path: any;
@@ -23,7 +22,7 @@ if (isNode) {
     if (!_node_os) _node_os = await import('os');
     if (!_node_path) _node_path = await import('path');
     if (!_node_fs) _node_fs = await import('fs');
-    // Assign to outer scope variables for use in the class
+    // Assign to outer scope variables for use in the class 
     node_os = _node_os;
     node_path = _node_path;
     node_fs = _node_fs;
