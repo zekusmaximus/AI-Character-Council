@@ -3,7 +3,9 @@ import { app as electronApp } from 'electron';
 // Environment detection
 const isNode = typeof window === 'undefined' && typeof process !== 'undefined' && process.versions && process.versions.node;
 
-let app: typeof electronApp | undefined;
+// Import electron as a default import first
+import electronPkg from 'electron';
+let app: typeof electronPkg.app | undefined;
 let node_os: any;
 let node_path: any;
 let node_fs: any;
