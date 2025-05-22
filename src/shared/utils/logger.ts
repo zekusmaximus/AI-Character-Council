@@ -1,4 +1,5 @@
-import { app as electronApp } from 'electron';
+import electronPkg from 'electron';
+const { app: electronApp } = electronPkg;
 
 // Environment detection
 const isNode = typeof window === 'undefined' && typeof process !== 'undefined' && process.versions && process.versions.node;
