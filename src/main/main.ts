@@ -1,6 +1,5 @@
 
-import pkg from 'electron';
-const { app, BrowserWindow } = pkg;
+import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
 import * as isDev from 'electron-is-dev';
 import { fileURLToPath } from 'url';
@@ -28,7 +27,7 @@ Logger.getInstance({
 const logger = Logger.getInstance();
 
 // Global reference to mainWindow to prevent garbage collection
-let mainWindow: typeof BrowserWindow | null = null;
+let mainWindow: BrowserWindow | null = null;
 
 /**
  * Initialize the application
