@@ -1,4 +1,8 @@
 
+const { app, BrowserWindow } = require('electron');
+const path = require('path');
+const isDev = require('electron-is-dev');
+
 import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
 import isDev from 'electron-is-dev';
@@ -8,12 +12,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Import error handling and logging
-import { initDatabase } from './services/initDatabase.js';
-import { Logger, LogLevel } from '../shared/utils/logger.js';
-import { ErrorHandler } from './error/ErrorHandler.js';
-import { ErrorMonitoring } from './error/ErrorMonitoring.js';
-import { initCoreIpcHandlers } from './ipc/ipcHandler.js';
-import { initEntityIpcHandlers } from './ipc/initEntityIpcHandlers.js';
+const { initDatabase } = require('./services/initDatabase');
+const { Logger, LogLevel } = require('../shared/utils/logger');
+const { ErrorHandler } = require('./error/ErrorHandler');
+const { ErrorMonitoring } = require('./error/ErrorMonitoring');
+const { initCoreIpcHandlers } = require('./ipc/ipcHandler');
+const { initEntityIpcHandlers } = require('./ipc/initEntityIpcHandlers');
 
 // Configure global logger
 const logLevel = isDev ? LogLevel.DEBUG : LogLevel.INFO;
