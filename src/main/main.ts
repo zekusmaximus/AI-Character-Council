@@ -3,6 +3,14 @@ const { app, BrowserWindow } = require('electron');
 const path = require('path');
 const isDev = require('electron-is-dev');
 
+import { app, BrowserWindow } from 'electron';
+import * as path from 'path';
+import isDev from 'electron-is-dev';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 // Import error handling and logging
 const { initDatabase } = require('./services/initDatabase');
 const { Logger, LogLevel } = require('../shared/utils/logger');
